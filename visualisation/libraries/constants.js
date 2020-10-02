@@ -1,0 +1,9 @@
+const PLUS_X = 100;
+const PLUS_Y = 60;
+const RADIUS = 30;
+const SIDE = 40;
+const HALF_RADIUS = RADIUS / 2;
+const HALF_SIDE = SIDE / 2;
+const ARROW_SIZE = 7;
+const BASE_Y = 200;
+const BASE_X = 200;
