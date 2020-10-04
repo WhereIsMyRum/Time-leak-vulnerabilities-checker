@@ -6,8 +6,6 @@
 using namespace std;
 
 time_leak::Place::Place(string id)
-: Element(id)
+    : Element(id)
 {
-
 }
-
