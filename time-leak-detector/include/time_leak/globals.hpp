@@ -6,6 +6,8 @@
 
 #define FILE_EXT ".json"
 
+#include "enums.hpp"
+
 namespace time_leak {
     class Place;
     class Transition;
@@ -14,6 +16,7 @@ namespace time_leak {
 namespace globals {
     extern std::map<std::string, time_leak::Place*> Places;
     extern std::map<std::string, time_leak::Transition*> Transitions;
+    extern std::map<enums::TransitionType, std::string> TransitionTypeToString;
 }
 
 #endif

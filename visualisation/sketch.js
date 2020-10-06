@@ -13,7 +13,7 @@ function draw() {
     background(255);
 
     if (!_computed) {
-        const net = net1;
+        const net = obfuscatedStart;
         [_places, _end] = createPlaces(net);
         [_transitions, _start] = createTransitions(net);
         _arrows = {};
@@ -150,8 +150,8 @@ class Transitions extends Shape {
 
 class Arc {
     constructor(baseId, targetId) {
-        this.startModifier = baseId[0] === 't' ? HALF_SIDE : HALF_RADIUS;
-        this.endModifier = baseId[0] === 't' ? HALF_RADIUS : HALF_SIDE;
+        this.startModifier = baseId[0].match('/t|l|h|T|L|H') ? HALF_SIDE : HALF_RADIUS;
+        this.endModifier = baseId[0].match('/t|l|h|T|L|H') ? HALF_RADIUS : HALF_SIDE;
         this.base = _transitions[baseId] ? _transitions[baseId] : _places[baseId];
         this.target = _transitions[targetId] ? _transitions[targetId] : _places[targetId];
     };
