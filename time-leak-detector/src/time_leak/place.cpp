@@ -21,17 +21,18 @@ bool time_leak::Place::IsTimeDeducible()
 }
 
 
-void time_leak::Place::AnalyzePlace()
+void time_leak::Place::AnalyzeDeeper()
 {
     cout << "Analyzing " << this->id << endl;
-    if (this->canTimeBeDeducted()) this->timeDeducible = true;
-
     analyzeIngoing();
     this->SetAnalyzed(true);
 
     if (this->canTimeBeDeducted()) this->timeDeducible = true;
+}
 
-
+void time_leak::Place::AnalyzeFirstLevel()
+{
+    if (this->canTimeBeDeducted()) this->timeDeducible = true;
 }
 
 
@@ -83,7 +84,16 @@ void time_leak::Place::analyzeIngoing()
 
     for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
-        if (!iterator->second->WasAnalyzed()) iterator->second->AnalyzeTransition();
+        if (!iterator->second->WasAnalyzed())  {
+            iterator->second->AnalyzeFirstLevel();
+            if (! iterator->second->WasAnalyzed()) globals::TransitionsAnalyzeQueue.Push(iterator->second);
+        }
+    }
+
+    if (globals::TransitionsAnalyzeQueue.Size() > 0)
+    {
+        Transition *transition = globals::TransitionsAnalyzeQueue.Pop();
+        transition->AnalyzeDeeper();
     }
 }
 

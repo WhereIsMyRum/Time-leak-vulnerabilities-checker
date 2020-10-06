@@ -27,12 +27,9 @@ bool time_leak::Transition::IsHigh()
 }
 
 
-void time_leak::Transition::AnalyzeTransition()
+void time_leak::Transition::AnalyzeDeeper()
 {
     cout << "Analyzing " << this->id << endl;
-    if (this->canDeduceEndTime()) this->transitionType = TransitionType::lowEnd;
-    if (this->canDeduceStartTime()) this->transitionType = this->transitionType == TransitionType::lowEnd ? TransitionType::low : TransitionType::lowStart;
-
     analyzeIngoing();
     this->SetAnalyzed(true);
 
@@ -51,8 +48,14 @@ void time_leak::Transition::AnalyzeTransition()
         if (this->canDeduceEndTime()) this->transitionType = TransitionType::lowEnd;
         if (this->canDeduceStartTime()) this->transitionType = this->transitionType == TransitionType::lowEnd ? TransitionType::low : TransitionType::lowStart;
     }
-
 }
+
+void time_leak::Transition::AnalyzeFirstLevel()
+{
+    if (this->canDeduceEndTime()) this->transitionType = TransitionType::lowEnd;
+    if (this->canDeduceStartTime()) this->transitionType = this->transitionType == TransitionType::lowEnd ? TransitionType::low : TransitionType::lowStart;
+}
+
 
 bool time_leak::Transition::canDeduceEndTime()
 {
@@ -97,7 +100,17 @@ void time_leak::Transition::analyzeIngoing()
 
     for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
-        if (!iterator->second->WasAnalyzed()) iterator->second->AnalyzePlace();
+        if (!iterator->second->WasAnalyzed()) 
+        {
+            iterator->second->AnalyzeFirstLevel();
+            if (! iterator->second->WasAnalyzed()) globals::PlacesAnalyzeQueue.Push(iterator->second);
+        }
+    }
+
+    if (globals::PlacesAnalyzeQueue.Size() > 0)
+    {
+        Place *place = globals::PlacesAnalyzeQueue.Pop();
+        place->AnalyzeDeeper();
     }
 }
 

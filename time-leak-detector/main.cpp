@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <map>
 #include <iterator>
-#include <vector>
+#include <queue>
 
 #include "include/time_leak/globals.hpp"
 #include "include/time_leak/place.hpp"
@@ -31,7 +31,8 @@ namespace globals
     map<std::string, time_leak::Place *> Places;
     map<std::string, time_leak::Transition *> Transitions;
     map<enums::TransitionType, string> TransitionTypeToString;
-
+    globals::UniqueFifo<time_leak::Place *> PlacesAnalyzeQueue;
+    globals::UniqueFifo<time_leak::Transition *> TransitionsAnalyzeQueue;
 } // namespace globals
 
 int main(int argc, char *argv[])
@@ -241,12 +242,13 @@ void PrintResults()
     for (iterator2 = globals::Places.begin(); iterator2 != globals::Places.end(); ++iterator2)
     {
         if (iterator2->second->IsTimeDeducible()) cout << iterator2->second->GetId() << " is timeDeducible." << endl;
-        else cout << iterator2->second->GetId() << " is not timeDeducible." << endl;
     }
 
 }
 
 void AnalyzeNet()
 {
-    globals::Places.at("end")->AnalyzePlace();
+    time_leak::Place *end = globals::Places.at("end");
+    end->AnalyzeFirstLevel();
+    end->AnalyzeDeeper();
 }
