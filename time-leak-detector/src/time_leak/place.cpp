@@ -9,7 +9,6 @@
 using namespace std;
 using namespace enums;
 
-
 time_leak::Place::Place(string id)
     : Element(id)
 {
@@ -20,23 +19,7 @@ bool time_leak::Place::IsTimeDeducible()
     return this->timeDeducible;
 }
 
-
-void time_leak::Place::AnalyzeDeeper()
-{
-    cout << "Analyzing " << this->id << endl;
-    analyzeIngoing();
-    this->SetAnalyzed(true);
-
-    if (this->canTimeBeDeducted()) this->timeDeducible = true;
-}
-
-void time_leak::Place::AnalyzeFirstLevel()
-{
-    if (this->canTimeBeDeducted()) this->timeDeducible = true;
-}
-
-
-bool time_leak::Place::canTimeBeDeducted()
+bool time_leak::Place::canTimeBeDeduced()
 {
     if (checkOutgoing() || checkIngoing())
     {
@@ -52,7 +35,7 @@ bool time_leak::Place::checkOutgoing()
 
     for (iterator = this->outElements.begin(); iterator != this->outElements.end(); ++iterator)
     {
-        if (!iterator->second->IsHigh() || iterator->second->GetTransitionType() == TransitionType::lowStart)
+        if (!iterator->second->IsHigh() || iterator->second->GetTransitionType() == TransitionType::low || iterator->second->GetTransitionType() == TransitionType::lowStart)
         {
             canBeDeduced = true;
             break;
@@ -69,7 +52,7 @@ bool time_leak::Place::checkIngoing()
 
     for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
-        if (!iterator->second->IsHigh() || iterator->second->GetTransitionType() == TransitionType::lowEnd)
+        if (!iterator->second->IsHigh() || iterator->second->GetTransitionType() == TransitionType::low || iterator->second->GetTransitionType() == TransitionType::lowEnd)
         {
             canBeDeduced = true;
             break;
@@ -78,23 +61,69 @@ bool time_leak::Place::checkIngoing()
     return canBeDeduced;
 }
 
-void time_leak::Place::analyzeIngoing()
+void time_leak::Place::Analyze()
 {
-    map<string, Transition*>::iterator iterator;
+    cout << "Analyzing " << this->id << endl;
+    if (this->canTimeBeDeduced())
+        this->timeDeducible = true;
+    this->SetAnalyzed(true);
+}
 
-    for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
+void time_leak::PopulatePlaces(rapidjson::Document &net)
+{
+    rapidjson::Value::ConstValueIterator iterator;
+    for (iterator = net["places"].Begin(); iterator != net["places"].End(); ++iterator)
     {
-        if (!iterator->second->WasAnalyzed())  {
-            iterator->second->AnalyzeFirstLevel();
-            globals::TransitionsAnalyzeQueue.Push(iterator->second);
+        if (net["flows"]["places"].HasMember(iterator->GetString()))
+        {
+            globals::Places.insert(pair<string, time_leak::Place *>(iterator->GetString(), new time_leak::Place(iterator->GetString())));
         }
-    }
-
-    if (globals::TransitionsAnalyzeQueue.Size() > 0)
-    {
-        if (globals::TransitionsAnalyzeQueue.Front()->AllInGoingAnalyzed())
-        Transition *transition = globals::TransitionsAnalyzeQueue.Pop();
-        transition->AnalyzeDeeper();
+        else
+        {
+            globals::Places.insert(pair<string, time_leak::Place *>("end", new time_leak::Place(iterator->GetString())));
+            globals::Places.at("end")->SetAnalyzed(true);
+        }
     }
 }
 
+time_leak::Place *time_leak::FindStartPlace()
+{
+    map<string, time_leak::Place *>::iterator iterator;
+    time_leak::Place *p;
+
+    for (iterator = globals::Places.begin(); iterator != globals::Places.end(); ++iterator)
+    {
+        if (iterator->second->GetInElements().size() == 0)
+        {
+            p = iterator->second;
+            break;
+        }
+    }
+
+    return p;
+}
+
+void time_leak::CreatePlacesForwardLinks(rapidjson::Document &net)
+{
+    map<string, time_leak::Place *>::iterator iterator;
+    for (iterator = globals::Places.begin(); iterator != globals::Places.end(); ++iterator)
+    {
+        const char *placeKey;
+        placeKey = iterator->second->GetId().c_str();
+        if (net["flows"]["places"].HasMember(placeKey))
+        {
+            for (rapidjson::SizeType i = 0; i < net["flows"]["places"][placeKey].Size(); ++i)
+            {
+                string transitionId = net["flows"]["places"][placeKey][i].GetString();
+                iterator->second->AddOutElement(globals::Transitions.at(transitionId));
+
+                time_leak::CreateTransitionBackwardLink(transitionId, iterator->second);
+            }
+        }
+    }
+}
+
+void time_leak::CreatePlaceBackwardLink(string transitionId, time_leak::Transition *transition)
+{
+    globals::Places.at(transitionId)->AddInElement(transition);
+}

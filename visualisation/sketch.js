@@ -13,7 +13,7 @@ function draw() {
     background(255);
 
     if (!_computed) {
-        const net = obfuscatedStart;
+        const net = nets.net2;
         [_places, _end] = createPlaces(net);
         [_transitions, _start] = createTransitions(net);
         _arrows = {};
@@ -238,8 +238,8 @@ function createPlaces(net) {
 function createTransitions(net) {
     const transitions = {};
     let places = [...net.places];
-
-    net.transitions.forEach(transitionId => {
+    const allTransitions = [...net.transitions.low, ...net.transitions.high]
+    allTransitions.forEach(transitionId => {
         const transition = new Transitions(transitionId, net.flows.transitions[transitionId]);
         transitions[transitionId] = transition;
 
@@ -298,8 +298,8 @@ function drawTransitions() {
 
 function drawPlaces() {
     Object.values(_places).forEach(place => {
-        const args = [ place.x, place.y, place.dimension ];
-        const argsText = [ place.id, place.x + HALF_RADIUS, place.y - HALF_RADIUS ]
+        const args = [place.x, place.y, place.dimension];
+        const argsText = [place.id, place.x + HALF_RADIUS, place.y - HALF_RADIUS]
         place.draw(circle, args, argsText);
     });
 };

@@ -7,7 +7,6 @@
 using namespace std;
 using namespace enums;
 
-
 time_leak::Transition::Transition(string id, bool high, TransitionType type)
     : Element(id)
 {
@@ -20,46 +19,15 @@ TransitionType time_leak::Transition::GetTransitionType()
     return this->transitionType;
 }
 
-
 bool time_leak::Transition::IsHigh()
 {
     return this->high;
 }
 
-
-void time_leak::Transition::AnalyzeDeeper()
-{
-    cout << "Analyzing " << this->id << endl;
-    analyzeIngoing();
-    this->SetAnalyzed(true);
-
-    if (this->transitionType != TransitionType::low && this->transitionType == TransitionType::lowEnd)
-    {
-        this->transitionType = this->canDeduceStartTime() ? TransitionType::low : TransitionType::lowEnd;
-    }
-
-    if (this->transitionType != TransitionType::low && this->transitionType == TransitionType::lowStart)
-    {
-        this->transitionType = this->canDeduceEndTime() ? TransitionType::low : TransitionType::lowStart;
-    }
-
-    if (this->transitionType == TransitionType::high)
-    {
-        if (this->canDeduceEndTime()) this->transitionType = TransitionType::lowEnd;
-        if (this->canDeduceStartTime()) this->transitionType = this->transitionType == TransitionType::lowEnd ? TransitionType::low : TransitionType::lowStart;
-    }
-}
-
-void time_leak::Transition::AnalyzeFirstLevel()
-{
-    if (this->canDeduceEndTime()) this->transitionType = TransitionType::lowEnd;
-    if (this->canDeduceStartTime()) this->transitionType = this->transitionType == TransitionType::lowEnd ? TransitionType::low : TransitionType::lowStart;
-}
-
-
 bool time_leak::Transition::canDeduceEndTime()
 {
-    if (!this->IsHigh()) return true;
+    if (!this->IsHigh())
+        return true;
 
     map<string, Place *>::iterator iterator;
     bool canBeDeduced = false;
@@ -78,7 +46,8 @@ bool time_leak::Transition::canDeduceEndTime()
 
 bool time_leak::Transition::canDeduceStartTime()
 {
-    if (!this->IsHigh()) return true;
+    if (!this->IsHigh())
+        return true;
 
     map<string, Place *>::iterator iterator;
     bool canBeDeduced = false;
@@ -94,24 +63,48 @@ bool time_leak::Transition::canDeduceStartTime()
     return canBeDeduced;
 }
 
-void time_leak::Transition::analyzeIngoing()
+void time_leak::Transition::Analyze()
 {
-    map<string, Place*>::iterator iterator;
+    cout << "Analyzing " << this->id << endl;
+    if (this->canDeduceEndTime())
+        this->transitionType = TransitionType::lowEnd;
+    if (this->canDeduceStartTime())
+        this->transitionType = this->transitionType == TransitionType::lowEnd ? TransitionType::low : TransitionType::lowStart;
+    this->SetAnalyzed(true);
+}
 
-    for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
+void time_leak::PopulateTransitions(rapidjson::Document &net)
+{
+    rapidjson::Value::ConstValueIterator iterator;
+    for (iterator = net["transitions"]["high"].Begin(); iterator != net["transitions"]["high"].End(); ++iterator)
     {
-        if (!iterator->second->WasAnalyzed()) 
-        {
-            iterator->second->AnalyzeFirstLevel();
-            globals::PlacesAnalyzeQueue.Push(iterator->second);
-        }
+        globals::Transitions.insert(pair<string, time_leak::Transition *>(iterator->GetString(), new time_leak::Transition(iterator->GetString())));
     }
 
-    if (globals::PlacesAnalyzeQueue.Size() > 0)
+    for (iterator = net["transitions"]["low"].Begin(); iterator != net["transitions"]["low"].End(); ++iterator)
     {
-        Place *place = globals::PlacesAnalyzeQueue.Pop();
-        place->AnalyzeDeeper();
+        globals::Transitions.insert(pair<string, time_leak::Transition *>(iterator->GetString(), new time_leak::Transition(iterator->GetString(), false, enums::TransitionType::low)));
     }
 }
 
+void time_leak::CreateTransitionsForwardLinks(rapidjson::Document &net)
+{
+    map<string, time_leak::Transition *>::iterator iterator;
+    for (iterator = globals::Transitions.begin(); iterator != globals::Transitions.end(); ++iterator)
+    {
+        const char *transitionKey = iterator->second->GetId().c_str();
+        for (rapidjson::SizeType i = 0; i < net["flows"]["transitions"][transitionKey].Size(); ++i)
+        {
+            string placeId = net["flows"]["transitions"][transitionKey][i].GetString();
+            placeId = globals::Places.find(placeId) == globals::Places.end() ? "end" : placeId;
+            iterator->second->AddOutElement(globals::Places.at(placeId));
 
+            time_leak::CreatePlaceBackwardLink(placeId, iterator->second);
+        }
+    }
+}
+
+void time_leak::CreateTransitionBackwardLink(string transitionId, time_leak::Place *place)
+{
+    globals::Transitions.at(transitionId)->AddInElement(place);
+}
