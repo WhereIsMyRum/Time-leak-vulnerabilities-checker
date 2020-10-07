@@ -16,5 +16,6 @@
   "bugs": {
     "url": "https://github.com/WhereIsMyRum/Time-leak-vulnerabilities-checker/issues"
   },
-  "homepage": "https://github.com/WhereIsMyRum/Time-leak-vulnerabilities-checker#readme"
+  "homepage": "https://github.com/WhereIsMyRum/Time-leak-vulnerabilities-checker#readme",
+  "dependencies": {}
 }

@@ -105,4 +105,4 @@ dist
 
 # Cpp
 *.exe
-/time-leak-detector/nets/*.json
+/time-leak-detector/nets/
