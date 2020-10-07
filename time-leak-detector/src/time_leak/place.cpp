@@ -86,12 +86,13 @@ void time_leak::Place::analyzeIngoing()
     {
         if (!iterator->second->WasAnalyzed())  {
             iterator->second->AnalyzeFirstLevel();
-            if (! iterator->second->WasAnalyzed()) globals::TransitionsAnalyzeQueue.Push(iterator->second);
+            globals::TransitionsAnalyzeQueue.Push(iterator->second);
         }
     }
 
     if (globals::TransitionsAnalyzeQueue.Size() > 0)
     {
+        if (globals::TransitionsAnalyzeQueue.Front()->AllInGoingAnalyzed())
         Transition *transition = globals::TransitionsAnalyzeQueue.Pop();
         transition->AnalyzeDeeper();
     }

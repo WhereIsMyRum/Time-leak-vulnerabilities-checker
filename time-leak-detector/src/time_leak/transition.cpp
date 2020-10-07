@@ -103,7 +103,7 @@ void time_leak::Transition::analyzeIngoing()
         if (!iterator->second->WasAnalyzed()) 
         {
             iterator->second->AnalyzeFirstLevel();
-            if (! iterator->second->WasAnalyzed()) globals::PlacesAnalyzeQueue.Push(iterator->second);
+            globals::PlacesAnalyzeQueue.Push(iterator->second);
         }
     }
 
