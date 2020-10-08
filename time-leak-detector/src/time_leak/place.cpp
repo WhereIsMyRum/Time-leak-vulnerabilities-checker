@@ -48,13 +48,13 @@ bool time_leak::Place::checkOutgoing()
 bool time_leak::Place::checkIngoing()
 {
     map<string, Transition *>::iterator iterator;
-    bool canBeDeduced = false;
+    bool canBeDeduced = this->inElements.size() > 0 ? true : false;
 
     for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
-        if (!iterator->second->IsHigh() || iterator->second->GetTransitionType() == TransitionType::low || iterator->second->GetTransitionType() == TransitionType::lowEnd)
+        if (iterator->second->IsHigh() && iterator->second->GetTransitionType() != TransitionType::low && iterator->second->GetTransitionType() != TransitionType::lowEnd)
         {
-            canBeDeduced = true;
+            canBeDeduced = false;
             break;
         }
     }

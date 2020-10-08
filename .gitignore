@@ -103,6 +103,9 @@ dist
 # TernJS port file
 .tern-port
 
+# JS
+*.min.js
+
 # Cpp
 *.exe
 /time-leak-detector/nets/

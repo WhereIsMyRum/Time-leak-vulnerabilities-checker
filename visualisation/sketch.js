@@ -13,7 +13,7 @@ function draw() {
     background(255);
 
     if (!_computed) {
-        const net = nets.net2;
+        const net = nets.parallelTL;
         [_places, _end] = createPlaces(net);
         [_transitions, _start] = createTransitions(net);
         _arrows = {};
