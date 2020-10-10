@@ -6,3 +6,50 @@ html, body {
 canvas {
   display: block;
 }
+
+#net-input-holder {
+    display: flex;;
+    justify-content: center;
+}
+
+#net-input {
+    padding: 10px 10px;
+    width: 400px;
+    height: 300px;
+    font-size: 10px;
+    margin-left: 10px;
+}
+
+.fn-buttons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.fn-buttons button {
+    margin: 0 5px;
+}
+
+#invalid-json-notification {
+    color: red;
+    margin-bottom: 3px;
+    text-align: center;
+    visibility: hidden;
+}
+
+.red-focus:focus {
+    outline: none !important;
+    border-color: red;
+}
+
+.input-holder {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-holder select {
+    height: 25px;
+    margin-right: 10px;
+}

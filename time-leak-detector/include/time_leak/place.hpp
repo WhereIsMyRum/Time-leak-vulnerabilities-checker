@@ -22,8 +22,6 @@ namespace time_leak
 
     public:
         Place(std::string id);
-        void AnalyzeFirstLevel();
-        void AnalyzeDeeper();
         bool IsTimeDeducible();
         void Analyze();
     };

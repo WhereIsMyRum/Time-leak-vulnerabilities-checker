@@ -1,34 +1,38 @@
-let _places, _transitions, _arrows, _start, _end, _mouseStartX, _mouseStartY, _draggedElement, _computed = false;
+const s = ( sketch ) => {
 
+let _places, _transitions, _arrows, _start, _end, _mouseStartX, _mouseStartY, _draggedElement, _computed = false, _mouseIsDragged = false;
 
-function setup() {
-    createCanvas(windowWidth, windowHeight);
+sketch.setup = () => {
+    const canvas = createCanvas(windowWidth, windowHeight / 2);
+    canvas.mouseMoved(mouseMoved);
+    canvas.mouseReleased(mouseReleased);
+    canvas.mousePressed(mousePressed);
+    canvas.parent('canvas');
     ellipseMode(CENTER);
     textAlign(CENTER, CENTER);
     textFont('Georgia');
-    noLoop();
+    sketch.noLoop();
 };
 
-function draw() {
+sketch.draw = () => {
     background(255);
-
-    if (!_computed) {
-        const net = nets.parallelTL;
+    if (!_computed) { 
         [_places, _end] = createPlaces(net);
         [_transitions, _start] = createTransitions(net);
         _arrows = {};
 
-        _places[_start].tokens = 1;
-        _places[_start].compute({ x: BASE_X, y: BASE_Y });
+        if (_places[_start]) {
+            _places[_start].tokens = 1;
+            _places[_start].compute({ x: BASE_X, y: BASE_Y });
+        }
         _computed = true;
     }
 
     drawAll();
 };
 
-
 class Shape {
-    constructor(id, dimension, tokens = 0) {
+    constructor(id, dimension, color = 'black', tokens = 0) {
         this.x = 0;
         this.y = 0;
         this.tokens = 0;
@@ -36,6 +40,7 @@ class Shape {
         this.computed = false;
         this.dimension = dimension;
         this.colorChange = false;
+        this.color = color;
     };
 
     checkIfNotOvelapping() {
@@ -66,7 +71,7 @@ class Shape {
     isMouseOver() {
         if (mouseX >= this.x - HALF_SIDE && mouseX <= this.x + HALF_SIDE) {
             if (mouseY >= this.y - HALF_SIDE && mouseY <= this.y + HALF_SIDE) {
-                return true;
+               return true;
             }
         }
         return false;
@@ -75,7 +80,7 @@ class Shape {
     set_colorChange(value) {
         if (this.colorChange !== value) {
             this.colorChange = value;
-            redraw();
+            sketch.redraw();
         }
     }
 
@@ -96,15 +101,18 @@ class Shape {
             cursor('pointer')
             pop();
         } else {
+            push();
+            stroke(this.color);
             callback(...args);
+            pop();
         }
         text(...argsText)
     }
 };
 
 class Place extends Shape {
-    constructor(id, transitions, tokens = 0, dimension = RADIUS) {
-        super(id, dimension, tokens);
+    constructor(id, transitions, color = 'black', tokens = 0, dimension = RADIUS) {
+        super(id, dimension, color, tokens);
         transitions ? this.transitions = transitions : this.transition = [];
     };
 
@@ -126,8 +134,8 @@ class Place extends Shape {
 };
 
 class Transitions extends Shape {
-    constructor(id, places, tokens = 0, dimension = SIDE) {
-        super(id, dimension, tokens);
+    constructor(id, places, color = 'black', tokens = 0, dimension = SIDE) {
+        super(id, dimension, color, tokens);
         places ? this.places = places : this.places = [];
     };
 
@@ -226,7 +234,7 @@ function createPlaces(net) {
     let end;
 
     net.places.forEach(placeId => {
-        const place = new Place(placeId, net.flows.places[placeId]);
+        const place = (net.colors && net.colors[placeId]) ? new Place(placeId, net.flows.places[placeId], net.colors[placeId]) : new Place(placeId, net.flows.places[placeId]);
         if (!net.flows.places[placeId]) end = placeId;
 
         places[placeId] = place;
@@ -240,7 +248,7 @@ function createTransitions(net) {
     let places = [...net.places];
     const allTransitions = [...net.transitions.low, ...net.transitions.high]
     allTransitions.forEach(transitionId => {
-        const transition = new Transitions(transitionId, net.flows.transitions[transitionId]);
+        const transition = (net.colors && net.colors[transitionId]) ? new Transitions(transitionId, net.flows.transitions[transitionId], net.colors[transitionId]) : new Transitions(transitionId, net.flows.transitions[transitionId]);
         transitions[transitionId] = transition;
 
         places = filterPlaces(net, transitionId, places);
@@ -306,7 +314,7 @@ function drawPlaces() {
 
 function adjustCanvas(x, y) {
     const newWidth = x >= windowWidth ? x + PLUS_X : windowWidth;
-    const newHeight = y >= windowHeight ? y + PLUS_Y : windowHeight;
+    const newHeight = y >= windowHeight ? y + PLUS_Y : windowHeight / 2;
     resizeCanvas(newWidth, newHeight);
 };
 
@@ -314,12 +322,14 @@ function mousePressed() {
     _mouseStartX = mouseX;
     _mouseStartY = mouseY;
     _draggedElement = getElementClicked();
+    _mouseIsDragged = true;
 }
 
 function mouseReleased() {
     _mouseStartY = undefined;
     _mouseStartY = undefined;
     _draggedElement = undefined;
+    _mouseIsDragged = false;
 }
 
 function mouseDragged() {
@@ -329,7 +339,7 @@ function mouseDragged() {
         _mouseStartX = mouseX;
         _mouseStartY = mouseY;
     }
-    redraw();
+    sketch.redraw();
 }
 
 function mouseMoved() {
@@ -340,6 +350,10 @@ function mouseMoved() {
     Object.values(_transitions).forEach(transition => {
         transition.checkForColorChange();
     })
+
+    if (_mouseIsDragged) {
+        mouseDragged();
+    }
 }
 
 function getElementClicked() {
@@ -354,3 +368,5 @@ function getPlaceClicked() {
 function getTransitionClicked() {
     return Object.values(_transitions).find(transition => transition.isMouseOver());
 }
+}
+

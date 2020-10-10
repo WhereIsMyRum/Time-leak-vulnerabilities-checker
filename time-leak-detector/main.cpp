@@ -67,6 +67,7 @@ void ParseNet(char *netSource, rapidjson::Document &d)
 {
     void ReadDirectlyFromCommandLine();
     rapidjson::Document ReadFile(char *fileName);
+    rapidjson::Document ReadDirectlyFromCommandLine(char *netString);
 
     if (strstr(netSource, FILE_EXT) != NULL)
     {
@@ -74,7 +75,7 @@ void ParseNet(char *netSource, rapidjson::Document &d)
     }
     else
     {
-        d = ReadFile(netSource);
+        d = ReadDirectlyFromCommandLine(netSource);
     }
 }
 
@@ -92,9 +93,12 @@ rapidjson::Document ReadFile(char *fileName)
     return d;
 }
 
-void ReadDirectlyFromCommandLine()
+rapidjson::Document ReadDirectlyFromCommandLine(char *netString)
 {
-    cout << "parsing from command line" << endl;
+    rapidjson::Document d;
+    d.Parse(netString);
+
+    return d;
 }
 
 void PopulatePlacesAndTransitions(rapidjson::Document &net)
