@@ -4,6 +4,7 @@
   "description": "Time leak vulnerabilities checker and visualizer for Petri Nets",
   "main": "index.js",
   "scripts": {
+    "start": "npm run server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "create-nets": "node create_nets_files.js",
     "dev": "nodemon server.js"
