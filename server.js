@@ -1,5 +1,5 @@
 const express = require('express');
-const process = require('child_process');
+const childProcess = require('child_process');
 const app = express();
 const bodyParser = require('body-parser');
 const fs = require('fs');
@@ -15,7 +15,7 @@ app.use(express.static(__dirname + '/visualisation'));
 app.post("/analyze", (request, response) => {
     //console.log(request.body.custom);
     //`${__dirname}/time-leak-detector/nets/net1.json`
-    let results = process.execFileSync(`${__dirname}/time-leak-detector/main.exe`, [JSON.stringify(request.body.custom)]).toString().split('\r\n');
+    let results = childProcess.execFileSync(`${__dirname}/time-leak-detector/main.exe`, [JSON.stringify(request.body.custom)]).toString().split('\r\n');
     const resultString = JSON.parse(JSON.stringify(request.body.custom));
     resultString.colors = {};
     results.forEach(result => {
