@@ -3,7 +3,7 @@ const process = require('child_process');
 const app = express();
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 
 
