@@ -103,7 +103,6 @@ rapidjson::Document ReadDirectlyFromCommandLine(char *netString)
 
 void PopulatePlacesAndTransitions(rapidjson::Document &net)
 {
-    void PopulateTransitions(rapidjson::Document & net);
     rapidjson::Value::ConstValueIterator iterator;
 
     time_leak::PopulatePlaces(net);
