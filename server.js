@@ -11,6 +11,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(express.static(__dirname + '/visualisation'));
 
+childProcess.execSync('chmod a+x /app/time-leak-detector/main');
+
 app.post("/analyze", (request, response) => {
     //console.log(request.body.custom);
     //`${__dirname}/time-leak-detector/nets/net1.json`
