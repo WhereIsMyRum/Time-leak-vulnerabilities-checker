@@ -65,7 +65,7 @@ bool time_leak::Transition::canDeduceStartTime()
 
 void time_leak::Transition::Analyze()
 {
-    cout << "Analyzing " << this->id << endl;
+    //cout << "Analyzing " << this->id << endl;
     if (this->canDeduceEndTime())
         this->transitionType = TransitionType::lowEnd;
     if (this->canDeduceStartTime())

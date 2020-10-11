@@ -15,7 +15,18 @@ app.use(express.static(__dirname + '/visualisation'));
 app.post("/analyze", (request, response) => {
     //console.log(request.body.custom);
     //`${__dirname}/time-leak-detector/nets/net1.json`
-    console.log(process.execFileSync(`${__dirname}/time-leak-detector/main.exe`, [JSON.stringify(request.body.custom)]).toString());
+    let results = process.execFileSync(`${__dirname}/time-leak-detector/main.exe`, [JSON.stringify(request.body.custom)]).toString().split('\r\n');
+    const resultString = JSON.parse(JSON.stringify(request.body.custom));
+    resultString.colors = {};
+    results.forEach(result => {
+        const res = result.split('-');
+        if (res && res[0].startsWith('H')) {
+            if (res[1] == 'low') resultString.colors[res[0]] = 'red';
+            else if (res[1] == 'lowEnd') resultString.colors[res[0]] = 'magenta';
+            else if (res[1] == 'lowStart') resultString.colors[res[0]] = 'orange';
+        };
+    });
+    response.send(resultString);
 });
 
 app.get("/nets", (request, response) => {

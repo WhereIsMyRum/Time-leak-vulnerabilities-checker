@@ -63,7 +63,7 @@ bool time_leak::Place::checkIngoing()
 
 void time_leak::Place::Analyze()
 {
-    cout << "Analyzing " << this->id << endl;
+    //cout << "Analyzing " << this->id << endl;
     if (this->canTimeBeDeduced())
         this->timeDeducible = true;
     this->SetAnalyzed(true);

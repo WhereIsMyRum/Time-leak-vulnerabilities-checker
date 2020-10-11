@@ -22,7 +22,7 @@ void CreateTransitionBackwardLink(string transitionId, time_leak::Place *place);
 void CreateLinks(rapidjson::Document &net);
 void PrintNet();
 void RunAnalysis();
-void PrintResults();
+void PrintResults(rapidjson::Document &net);
 void PopulateTransitionTypeToString();
 template <class T>
 void ResetAnalyzedFlag(T &Elements);
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
     PrintNet();
     RunAnalysis();
-    PrintResults();
+    PrintResults(net);
 }
 
 bool CheckForArgumentsPassed(int argc)
@@ -112,10 +112,10 @@ void PopulatePlacesAndTransitions(rapidjson::Document &net)
 
 void PopulateTransitionTypeToString()
 {
-    globals::TransitionTypeToString.insert(pair<enums::TransitionType, string>(enums::TransitionType::high, "High"));
-    globals::TransitionTypeToString.insert(pair<enums::TransitionType, string>(enums::TransitionType::low, "Low"));
-    globals::TransitionTypeToString.insert(pair<enums::TransitionType, string>(enums::TransitionType::lowEnd, "LowEnd"));
-    globals::TransitionTypeToString.insert(pair<enums::TransitionType, string>(enums::TransitionType::lowStart, "LowStart"));
+    globals::TransitionTypeToString.insert(pair<enums::TransitionType, string>(enums::TransitionType::high, "high"));
+    globals::TransitionTypeToString.insert(pair<enums::TransitionType, string>(enums::TransitionType::low, "low"));
+    globals::TransitionTypeToString.insert(pair<enums::TransitionType, string>(enums::TransitionType::lowEnd, "lowEnd"));
+    globals::TransitionTypeToString.insert(pair<enums::TransitionType, string>(enums::TransitionType::lowStart, "lowStart"));
 }
 
 void CreateLinks(rapidjson::Document &net)
@@ -126,9 +126,9 @@ void CreateLinks(rapidjson::Document &net)
 
 void PrintNet()
 {
-    cout << "Places: " << globals::Places.size() << endl;
-    cout << "Transitions: " << globals::Transitions.size() << endl;
-    globals::Places.at("end")->Print();
+    //cout << "Places: " << globals::Places.size() << endl;
+    //cout << "Transitions: " << globals::Transitions.size() << endl;
+    //globals::Places.at("end")->Print();
 }
 
 void RunAnalysis()
@@ -169,18 +169,18 @@ void ResetAnalyzedFlag(T &Elements)
     }
 }
 
-void PrintResults()
+void PrintResults(rapidjson::Document &net)
 {
     map<string, time_leak::Transition *>::iterator iterator;
     for (iterator = globals::Transitions.begin(); iterator != globals::Transitions.end(); ++iterator)
     {
-        cout << iterator->second->GetId() << " is " << globals::TransitionTypeToString.at(iterator->second->GetTransitionType()) << endl;
+        cout << iterator->second->GetId() << "-" << globals::TransitionTypeToString.at(iterator->second->GetTransitionType()) << endl;
     }
 
-    map<string, time_leak::Place *>::iterator iterator2;
+    /*map<string, time_leak::Place *>::iterator iterator2;
     for (iterator2 = globals::Places.begin(); iterator2 != globals::Places.end(); ++iterator2)
     {
         if (iterator2->second->IsTimeDeducible())
             cout << iterator2->second->GetId() << " is timeDeducible." << endl;
-    }
+    }*/
 }

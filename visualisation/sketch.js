@@ -3,7 +3,7 @@ const s = ( sketch ) => {
 let _places, _transitions, _arrows, _start, _end, _mouseStartX, _mouseStartY, _draggedElement, _computed = false, _mouseIsDragged = false;
 
 sketch.setup = () => {
-    const canvas = createCanvas(windowWidth, windowHeight / 2);
+    const canvas = createCanvas(windowWidth, 380);
     canvas.mouseMoved(mouseMoved);
     canvas.mouseReleased(mouseReleased);
     canvas.mousePressed(mousePressed);
@@ -314,7 +314,7 @@ function drawPlaces() {
 
 function adjustCanvas(x, y) {
     const newWidth = x >= windowWidth ? x + PLUS_X : windowWidth;
-    const newHeight = y >= windowHeight ? y + PLUS_Y : windowHeight / 2;
+    const newHeight = y >= windowHeight ? y + PLUS_Y : 380;
     resizeCanvas(newWidth, newHeight);
 };
 

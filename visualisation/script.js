@@ -1,4 +1,4 @@
-let myp5 = new p5(s);
+let myp5;
 const netHolder = document.getElementById('net-input');
 const invalidJson = document.getElementById('invalid-json-notification');
 const defaultNet = { "places": [], "transitions": { "high": [], "low": [] }, "flows": { "places": {}, "transitions": {} } };
@@ -17,17 +17,23 @@ function update() {
         const tmpNet = JSON.parse(netHolder.value);
         invalidJson.style.visibility = "hidden";
         if (netHolder.classList.contains('red-focus')) netHolder.classList.remove('red-focus');
-        net = tmpNet;
-        myp5 = new p5(s);
+        reRender(tmpNet);
     } catch (e) {
         invalidJson.style.visibility = "visible";
         netHolder.classList.add('red-focus');
     }
 }
 
+function reRender(tmpNet) {
+    net = tmpNet;
+    if (myp5) myp5.remove();
+    myp5 = new p5(s);
+}
+
 function clearForm() {
     if (window.confirm('You sure you want to clear?')) {
         netHolder.value = JSON.stringify(defaultNet, undefined, 4);
+        setSelectToDefault();
         update();
     } else {
         update();
@@ -52,8 +58,9 @@ function analyze() {
         headers: {
             'Content-Type': 'application/json'
         }
-    }).then(res => {
     })
+    .then(res => res.json())
+    .then(data => reRender(data));
 }
 
 function addToSelect(data) {
@@ -71,4 +78,9 @@ function selectChange(element) {
     .then(res => res.json())
     .then(data => netHolder.value = JSON.stringify(data, undefined, 4))
     .then(() => update());
+}
+
+function setSelectToDefault() {
+    const select = document.getElementById('nets-select');
+    select.selectedIndex = 0;
 }
