@@ -218,3 +218,5 @@ const nets = {
         }
     }
 }
+
+module.exports = { nets } 
