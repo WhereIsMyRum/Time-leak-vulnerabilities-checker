@@ -27,7 +27,7 @@ app.post("/analyze", (request, response) => {
             else if (res[1] == 'lowStart') resultString.colors[res[0]] = 'orange';
         };
     });
-    response.send(results);
+    response.send(resultString);
 });
 
 app.get("/nets", (request, response) => {
