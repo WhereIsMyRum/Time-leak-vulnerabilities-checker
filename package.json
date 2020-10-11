@@ -2,7 +2,7 @@
   "name": "time-leak-vulnerabilities-checker",
   "version": "1.0.0",
   "description": "Time leak vulnerabilities checker and visualizer for Petri Nets",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -21,7 +21,9 @@
   "homepage": "https://github.com/WhereIsMyRum/Time-leak-vulnerabilities-checker#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "express": "^4.17.1",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
     "nodemon": "^2.0.4"
   }
 }
