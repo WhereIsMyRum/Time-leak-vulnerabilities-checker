@@ -6,3 +6,86 @@ html, body {
 canvas {
   display: block;
 }
+
+#net-input-holder {
+    display: flex;;
+    justify-content: center;
+}
+
+#net-input {
+    padding: 10px 10px;
+    width: 400px;
+    height: 300px;
+    font-size: 10px;
+    margin-left: 10px;
+}
+
+.fn-buttons {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.fn-buttons button {
+    margin: 0 5px;
+}
+
+#invalid-json-notification {
+    color: red;
+    margin-bottom: 3px;
+    text-align: center;
+    visibility: hidden;
+}
+
+.red-focus:focus {
+    outline: none !important;
+    border-color: red;
+}
+
+.input-holder {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-holder select {
+    height: 25px;
+    margin-right: 10px;
+}
+
+#color-codes {
+    margin-left: 25px;
+}
+
+.color-codes-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.color-codes-wrapper p {
+    margin: 0;
+}
+
+.square {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 10px;
+}
+
+.legend-header {
+    font-size: 18px;
+}
+
+.red {
+    background-color: #FF4D4D;
+}
+
+.orange {
+    background-color: #FFC04D;
+}
+
+.magenta {
+    background-color: #FF4DFF;
+}
