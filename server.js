@@ -2,10 +2,12 @@ const express = require('express');
 const childProcess = require('child_process');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const PORT = 5000;
+const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
-const PORT = process.env.PORT || 5000;
-
-const app = express();
+if (!process.env.NODE_ENV || process.env.NODE_ENV !== 'dev') { 
+    app.use(redirectToHTTPS);
+}
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
@@ -31,12 +33,29 @@ app.post("/analyze", (request, response) => {
 
 app.get("/nets", (request, response) => {
     let nets = fs.readdirSync(`${__dirname}/time-leak-detector/nets`);
-    nets = nets.map(net => {
+    
+    nets = nets.map((net) => {
+        const n = net.split('.');
         return {
-            "value": net,
-            "text": net.replace('.json', '').replace(/-/g, ' ')
+            order: Number(n[0]),
+            value: `${n[0]}.${n[1]}.${n[2]}`
         };
     });
+
+    nets = nets.sort((n1, n2) => {
+        if(n1.order > n2.order) {
+            return 1;
+        }
+        return -1;
+    });
+
+    nets = nets.map(net => {
+        return {
+            "value": net.value,
+            "text": net.value.replace('.json', '').replace(/-/g, ' ')
+        };
+    });
+
     response.send(nets);
 });
 

@@ -7,8 +7,7 @@
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "create-nets": "node create_nets_files.js",
-    "dev": "nodemon server.js",
-    "copy-main": "docker cp f122a31e81f0:/usr/src/app/main ./time-leak-detector/main"
+    "dev": "set NODE_ENV=dev&&nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -22,9 +21,8 @@
   "homepage": "https://github.com/WhereIsMyRum/Time-leak-vulnerabilities-checker#readme",
   "dependencies": {
     "body-parser": "^1.19.0",
-    "express": "^4.17.1"
-  },
-  "devDependencies": {
+    "express": "^4.17.1",
+    "express-http-to-https": "^1.1.4",
     "nodemon": "^2.0.4"
   }
 }
