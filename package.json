@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "create-nets": "node create_nets_files.js",
     "dev": "nodemon server.js",
-    "copy-main": "docker cp 6e6a1dafef4f:/usr/src/app/main ./time-leak-detector/main"
+    "copy-main": "docker cp f122a31e81f0:/usr/src/app/main ./time-leak-detector/main"
   },
   "repository": {
     "type": "git",
