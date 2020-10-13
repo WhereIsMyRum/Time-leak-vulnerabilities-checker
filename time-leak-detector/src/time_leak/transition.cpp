@@ -50,13 +50,13 @@ bool time_leak::Transition::canDeduceStartTime()
         return true;
 
     map<string, Place *>::iterator iterator;
-    bool canBeDeduced = false;
+    bool canBeDeduced = true;
 
     for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
-        if (iterator->second->IsTimeDeducible())
+        if (!iterator->second->IsTimeDeducible())
         {
-            canBeDeduced = true;
+            canBeDeduced = false;
             break;
         }
     }
