@@ -24,6 +24,12 @@ namespace globals
     extern std::map<enums::TransitionType, std::string> TransitionTypeToString;
     extern time_leak::ElementUniqueFifo<time_leak::Place *> PlacesQueue;
     extern time_leak::ElementUniqueFifo<time_leak::Transition *> TransitionsQueue;
+    extern bool changed;
+
+    extern bool WasChanged();
+    extern void ChangesMade();
+    extern void ResetChanged();
+
 } // namespace globals
 
 #endif

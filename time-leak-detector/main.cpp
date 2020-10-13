@@ -34,6 +34,22 @@ namespace globals
     map<enums::TransitionType, string> TransitionTypeToString;
     time_leak::ElementUniqueFifo<time_leak::Place *> PlacesQueue;
     time_leak::ElementUniqueFifo<time_leak::Transition *> TransitionsQueue;
+    bool changed = true;
+
+    bool WasChanged()
+    {
+        return changed;
+    }
+
+    void ChangesMade()
+    {
+        changed = true;
+    }
+
+    void ResetChanged()
+    {
+        changed = false;
+    }
 } // namespace globals
 
 int main(int argc, char *argv[])
@@ -136,28 +152,34 @@ void RunAnalysis()
     void AnalyzeNet(time_leak::Place * startPlace, bool upwards);
 
     // analyze bottom-up
-    AnalyzeNet(globals::Places.at("end"), true);
+    while (globals::WasChanged())
+    {
+        globals::ResetChanged();
 
-    globals::TransitionsQueue.Clear();
-    globals::PlacesQueue.Clear();
+        AnalyzeNet(globals::Places.at("end"), true);
 
-    ResetAnalyzedFlag(globals::Places);
-    ResetAnalyzedFlag(globals::Transitions);
+        globals::TransitionsQueue.Clear();
+        globals::PlacesQueue.Clear();
 
-    // analyze top-down
-    AnalyzeNet(time_leak::FindStartPlace(), false);
+        ResetAnalyzedFlag(globals::Places);
+        ResetAnalyzedFlag(globals::Transitions);
+
+        // analyze top-down
+        AnalyzeNet(time_leak::FindStartPlace(), false);
+    }
 }
 
 void AnalyzeNet(time_leak::Place *startPlace, bool upwards)
 {
-    startPlace->Analyze();
-    startPlace->Traverse(startPlace->GetElementsBasedOnDirection(upwards), globals::TransitionsQueue);
 
-    while (globals::PlacesQueue.Size() > 0 || globals::TransitionsQueue.Size() > 0)
-    {
-        time_leak::ForwardQueue(globals::TransitionsQueue, globals::PlacesQueue, upwards);
-        time_leak::ForwardQueue(globals::PlacesQueue, globals::TransitionsQueue, upwards);
-    }
+        startPlace->Analyze();
+        startPlace->Traverse(startPlace->GetElementsBasedOnDirection(upwards), globals::TransitionsQueue);
+
+        while (globals::PlacesQueue.Size() > 0 || globals::TransitionsQueue.Size() > 0)
+        {
+            time_leak::ForwardQueue(globals::TransitionsQueue, globals::PlacesQueue, upwards);
+            time_leak::ForwardQueue(globals::PlacesQueue, globals::TransitionsQueue, upwards);
+        }
 }
 
 template <class T>

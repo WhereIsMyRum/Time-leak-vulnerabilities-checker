@@ -21,11 +21,14 @@ bool time_leak::Place::IsTimeDeducible()
 
 bool time_leak::Place::canTimeBeDeduced()
 {
-    if (checkOutgoing() || checkIngoing())
-    {
-        return true;
-    }
-    return false;
+    bool deducable = false;
+
+    if (checkOutgoing())
+        deducable = true;
+    if (checkIngoing())
+        deducable = true;
+
+    return deducable;
 }
 
 bool time_leak::Place::checkOutgoing()
@@ -64,8 +67,13 @@ bool time_leak::Place::checkIngoing()
 void time_leak::Place::Analyze()
 {
     //cout << "Analyzing " << this->id << endl;
+    bool initialVal = this->timeDeducible;
     if (this->canTimeBeDeduced())
         this->timeDeducible = true;
+
+    if (initialVal != this->timeDeducible)
+        globals::ChangesMade();
+
     this->SetAnalyzed(true);
 }
 
