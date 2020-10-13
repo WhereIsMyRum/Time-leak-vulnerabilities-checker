@@ -6,9 +6,7 @@ const fs = require('fs');
 const PORT = 5000;
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
-if (!process.env.NODE_ENV || process.env.NODE_ENV !== 'dev') { 
-    app.use(redirectToHTTPS);
-}
+app.use(redirectToHTTPS([/localhost:(\d{4})/],[],301));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
