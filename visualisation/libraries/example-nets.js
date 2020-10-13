@@ -1,5 +1,5 @@
 const nets = {
-    "net1": {
+    "1\.Example-net-1": {
         "places": ["p1", "p2", "p3", "p4"],
         "transitions": {
             "high": ["H1", "H2"],
@@ -20,7 +20,7 @@ const nets = {
             }
         }
     },
-    "net2": {
+    "2\.Example-net-2": {
         "places": ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"],
         "transitions": {
             "high": ["H1", "H2", "H3"],
@@ -46,7 +46,7 @@ const nets = {
             }
         }
     },
-    "net3": {
+    "3\.Example-net-3": {
         "places": ["p1", "p2", "p3", "p4", "p5"],
         "transitions": {
             "high": [],
@@ -66,7 +66,7 @@ const nets = {
         }
     },
 
-    "basicTL": {
+    "4.Basic-TL": {
         "places": ["p1", "p2", "p3", "p4"],
         "transitions": {
             "high": ["H1"],
@@ -86,7 +86,47 @@ const nets = {
         }
     },
 
-    "parallelTL": {
+    "5\.Obfuscated-End": {
+        "places": ["p1", "p2", "p3", "p4"],
+        "transitions": {
+            "high": ["H1", "H2"],
+            "low": ["L1"]
+        },
+        "flows": {
+            "places": {
+                "p1": ["L1"],
+                "p2": ["H1"],
+                "p3": ["H2"]
+            },
+            "transitions": {
+                "L1": ["p2"],
+                "H1": ["p3"],
+                "H2": ["p4"]
+            }
+        }
+    },
+
+    "6\.Obfuscated-Start": {
+        "places": ["p1", "p2", "p3", "p4"],
+        "transitions": {
+            "high": ["H1", "H2"],
+            "low": ["L2"]
+        },
+        "flows": {
+            "places": {
+                "p1": ["H1"],
+                "p2": ["H2"],
+                "p3": ["L2"]
+            },
+            "transitions": {
+                "H1": ["p2"],
+                "H2": ["p3"],
+                "L2": ["p4"]
+            }
+        }
+    },
+
+    "7\.Parallel-TL": {
         "places": ["p1", "p2", "p3", "p4", "p5", "p6"],
         "transitions": {
             "low": ["L1", "L2", "L3"],
@@ -109,7 +149,7 @@ const nets = {
         }
     },
 
-    "parallelTLByPlace": {
+    "8\.Parallel-TL-By-Place": {
         "places": ["p1", "p2", "p3", "p4", "p5"],
         "transitions": {
             "low": ["L1", "L2"],
@@ -131,47 +171,7 @@ const nets = {
         }
     },
 
-    "obfuscatedEnd": {
-        "places": ["p1", "p2", "p3", "p4"],
-        "transitions": {
-            "high": ["H1", "H2"],
-            "low": ["L1"]
-        },
-        "flows": {
-            "places": {
-                "p1": ["L1"],
-                "p2": ["H1"],
-                "p3": ["H2"]
-            },
-            "transitions": {
-                "L1": ["p2"],
-                "H1": ["p3"],
-                "H2": ["p4"]
-            }
-        }
-    },
-
-    "obfuscatedStart": {
-        "places": ["p1", "p2", "p3", "p4"],
-        "transitions": {
-            "high": ["H1", "H2"],
-            "low": ["L2"]
-        },
-        "flows": {
-            "places": {
-                "p1": ["H1"],
-                "p2": ["H2"],
-                "p3": ["L2"]
-            },
-            "transitions": {
-                "H1": ["p2"],
-                "H2": ["p3"],
-                "L2": ["p4"]
-            }
-        }
-    },
-
-    "combinedTL": {
+    "9\.Combined-TL": {
         "places": ["p1", "p2", "p3", "p4", "p5", "p6", "p7"],
         "transitions": {
             "high": ["H1", "H2"],
@@ -196,7 +196,7 @@ const nets = {
             }
         }
     },
-    "testLowStart": {
+    "10\.Test-Low-Start": {
         "places": ["p1", "p2", "p3", "p4"],
         "transitions": {
             "high": ["H1", "H2", "H3"],
@@ -217,7 +217,7 @@ const nets = {
             }
         }
     },
-    "combinedMultipleLayers": {
+    "12\.Combined-Multiple-Layers": {
         "places": ["p1","p2","p3","p4","p5","p6","p7","p8","p9","p10","p11"],
         "transitions": {
             "high": ["H1","H2","H3","H4"],
