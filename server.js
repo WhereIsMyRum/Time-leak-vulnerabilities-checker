@@ -34,7 +34,7 @@ app.get("/nets", (request, response) => {
     nets = nets.map(net => {
         return {
             "value": net,
-            "text": net.replace('.json', '').replace(/([a-z])([A-Z])/g, '$1 $2')
+            "text": net.replace('.json', '').replace(/-/g, ' ')
         };
     });
     response.send(nets);
