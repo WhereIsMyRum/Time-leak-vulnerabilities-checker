@@ -66,10 +66,15 @@ bool time_leak::Transition::canDeduceStartTime()
 void time_leak::Transition::Analyze()
 {
     //cout << "Analyzing " << this->id << endl;
+    TransitionType initialVal = this->transitionType;
+
     if (this->canDeduceEndTime())
         this->transitionType = TransitionType::lowEnd;
     if (this->canDeduceStartTime())
         this->transitionType = this->transitionType == TransitionType::lowEnd ? TransitionType::low : TransitionType::lowStart;
+
+    if (initialVal != this->transitionType)
+        globals::ChangesMade();
     this->SetAnalyzed(true);
 }
 

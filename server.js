@@ -14,9 +14,8 @@ app.use(express.static(__dirname + '/visualisation'));
 childProcess.execSync('chmod a+x /app/time-leak-detector/main');
 
 app.post("/analyze", (request, response) => {
-    //console.log(request.body.custom);
-    //`${__dirname}/time-leak-detector/nets/net1.json`
-    let results = childProcess.execFileSync(`${__dirname}/time-leak-detector/main`, [JSON.stringify(request.body.custom)]).toString().replace('\r', '').split('\n');
+    let results = childProcess.execFileSync(`${__dirname}/time-leak-detector/main`, [JSON.stringify(request.body.custom)]).toString().split('\n');
+    results = results.map(result => result.replace('\r', ''));
     const resultString = JSON.parse(JSON.stringify(request.body.custom));
     resultString.colors = {};
     results.forEach(result => {
