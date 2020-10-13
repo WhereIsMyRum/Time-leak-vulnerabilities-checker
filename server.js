@@ -3,12 +3,10 @@ const childProcess = require('child_process');
 const app = express();
 const bodyParser = require('body-parser');
 const fs = require('fs');
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
-
 app.use(redirectToHTTPS([/localhost:(\d{4})/],[],301));
-
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
