@@ -2,10 +2,12 @@
 #define PLACE
 
 #include <string>
+#include <iostream>
 #include <map>
+#include <iterator>
 
 #include "element.hpp"
-#include "enums.hpp"
+#include "transition.hpp"
 
 class Transition;
 
@@ -23,13 +25,9 @@ namespace time_leak
     public:
         Place(std::string id);
         bool IsTimeDeducible();
-        void Analyze();
+        bool Analyze();
     };
 
-    void PopulatePlaces(rapidjson::Document &net);
-    time_leak::Place *FindStartPlace();
-    void CreatePlacesForwardLinks(rapidjson::Document &net);
-    void CreatePlaceBackwardLink(string transitionId, time_leak::Transition *transition);
 } // namespace time_leak
 
 #endif

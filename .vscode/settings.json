@@ -66,6 +66,8 @@
         "xmemory0": "cpp",
         "xstddef": "cpp",
         "xtr1common": "cpp",
+        "xtree": "cpp",
+        "queue": "cpp",
         "xstring": "cpp"
     },
     "liveServer.settings.port": 5501

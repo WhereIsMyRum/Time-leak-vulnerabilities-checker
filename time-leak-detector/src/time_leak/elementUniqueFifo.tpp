@@ -48,17 +48,20 @@ void time_leak::ElementUniqueFifo<T>::Clear()
 }
 
 template <class T, class T2>
-void time_leak::ForwardQueue(T &queue1, T2 &queue2, bool direction)
+bool time_leak::ForwardQueue(T &queue1, T2 &queue2, bool direction)
 {
+    bool changesMade = false;
     if (queue1.Size() > 0)
     {
         if (queue1.Front()->AllDirectionsAnalyzed(direction))
         {
             auto element = queue1.Pop();
-            element->Analyze();
+            changesMade = element->Analyze();
             element->Traverse(element->GetElementsBasedOnDirection(direction), queue2);
         }
         else
             queue1.Shift();
     }
+
+    return changesMade;
 }
