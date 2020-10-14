@@ -4,7 +4,6 @@
 #include <string>
 #include <map>
 
-#include "globals.hpp"
 #include "elementUniqueFifo.hpp"
 #include "../../include/rapidjson/document.h"
 

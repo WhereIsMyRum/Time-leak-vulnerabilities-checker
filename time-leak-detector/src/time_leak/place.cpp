@@ -1,7 +1,6 @@
 #include "../../include/time_leak/place.hpp"
 
 using namespace std;
-using namespace enums;
 
 time_leak::Place::Place(string id)
     : Element(id)
@@ -32,7 +31,7 @@ bool time_leak::Place::checkOutgoing()
 
     for (iterator = this->outElements.begin(); iterator != this->outElements.end(); ++iterator)
     {
-        if (iterator->second->CheckIfLow() || iterator->second->GetTransitionType() == TransitionType::lowStart)
+        if (iterator->second->CheckIfLow() || iterator->second->GetTransitionType() == Transition::TransitionType::lowStart)
         {
             canBeDeduced = true;
             break;
@@ -49,7 +48,7 @@ bool time_leak::Place::checkIngoing()
 
     for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
-        if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != TransitionType::lowEnd)
+        if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != Transition::TransitionType::lowEnd)
         {
             canBeDeduced = false;
             break;

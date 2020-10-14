@@ -2,7 +2,7 @@
 
 using namespace std;
 
-time_leak::Net::Net(rapidjson::Document& net)
+time_leak::Net::Net(rapidjson::Document net)
 {
     this->net.CopyFrom(net, this->net.GetAllocator());
     this->changed = true;
@@ -42,7 +42,7 @@ void time_leak::Net::populateTransitions()
 
     for (iterator = net["transitions"]["low"].Begin(); iterator != net["transitions"]["low"].End(); ++iterator)
     {
-        lowTransitions.insert(pair<string, time_leak::Transition *>(iterator->GetString(), new time_leak::Transition(iterator->GetString(), false, enums::TransitionType::low)));
+        lowTransitions.insert(pair<string, time_leak::Transition *>(iterator->GetString(), new time_leak::Transition(iterator->GetString(), false, Transition::TransitionType::low)));
     }
 }
 
@@ -169,7 +169,7 @@ void time_leak::Net::PrintResults()
     map<string, time_leak::Transition *>::iterator iterator;
     for (iterator = highTransitions.begin(); iterator != highTransitions.end(); ++iterator)
     {
-        cout << iterator->second->GetId() << "-" << globals::TransitionTypeToString.at(iterator->second->GetTransitionType()) << endl;
+        cout << iterator->second->GetId() << "-" << iterator->second->GetTransitionTypeString() << endl;
     }
 
     /*map<string, time_leak::Place *>::iterator iterator2;

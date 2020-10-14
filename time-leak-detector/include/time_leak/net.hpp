@@ -41,7 +41,7 @@ namespace time_leak
             void resetChanged();
 
         public:
-            Net(rapidjson::Document& net);
+            Net(rapidjson::Document net);
             void PrintNet();
             void RunAnalysis();
             void PrintResults();

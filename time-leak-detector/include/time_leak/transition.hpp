@@ -6,7 +6,6 @@
 #include <map>
 
 #include "element.hpp"
-#include "enums.hpp"
 
 #include "../../include/time_leak/place.hpp"
 
@@ -17,19 +16,28 @@ namespace time_leak
 {
     class Transition : public time_leak::Element<Place>
     {
+    public:
+        enum TransitionType 
+        {
+            high, low, lowStart, lowEnd
+        };
+
     private:
-        bool high;
-        enums::TransitionType transitionType;
+        bool highT;
         bool canDeduceEndTime();
         bool canDeduceStartTime();
         void analyzeIngoing();
+        TransitionType transitionType;
 
     public:
-        Transition(std::string id, bool high = true, enums::TransitionType type = enums::TransitionType::high);
-        enums::TransitionType GetTransitionType();
+        Transition(std::string id, bool high = true, TransitionType type = TransitionType::high);
+        TransitionType GetTransitionType();
         bool IsHigh();
         bool CheckIfLow();
         bool Analyze();
+        std::string GetTransitionTypeString();
+        
+
     };
 } // namespace time_leak
 

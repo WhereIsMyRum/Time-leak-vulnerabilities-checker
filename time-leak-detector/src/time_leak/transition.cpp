@@ -1,28 +1,49 @@
 #include "../../include/time_leak/transition.hpp"
 
 using namespace std;
-using namespace enums;
 
 time_leak::Transition::Transition(string id, bool high, TransitionType type)
     : Element(id)
 {
     this->transitionType = type;
-    this->high = high;
+    this->highT = high;
 }
 
-TransitionType time_leak::Transition::GetTransitionType()
+time_leak::Transition::TransitionType time_leak::Transition::GetTransitionType()
 {
     return this->transitionType;
 }
 
+string time_leak::Transition::GetTransitionTypeString()
+{
+    string transitionString;
+    switch (this->transitionType)
+    {
+        case TransitionType::high:
+            transitionString = "high";
+            break;
+        case  TransitionType::low:
+            transitionString ="low";
+            break;
+        case TransitionType::lowEnd:
+            transitionString = "lowEnd";
+            break;
+        case TransitionType::lowStart:
+            transitionString = "lowStart";
+            break;
+    }
+
+    return transitionString;
+}
+
 bool time_leak::Transition::IsHigh()
 {
-    return this->high;
+    return this->highT;
 }
 
 bool time_leak::Transition::CheckIfLow()
 {
-    return !this->high || this->transitionType == TransitionType::low;
+    return !this->highT || this->transitionType == Transition::TransitionType::low;
 }
 
 bool time_leak::Transition::canDeduceEndTime()

@@ -8,7 +8,6 @@
 
 #include "element.hpp"
 #include "transition.hpp"
-#include "enums.hpp"
 
 class Transition;
 
