@@ -27,13 +27,13 @@ bool time_leak::Place::canTimeBeDeduced()
 bool time_leak::Place::checkOutgoing()
 {
     map<string, Transition *>::iterator iterator;
-    bool canBeDeduced = false;
+    bool canBeDeduced = this->outElements.size() > 0 ? true : false;
 
     for (iterator = this->outElements.begin(); iterator != this->outElements.end(); ++iterator)
     {
-        if (iterator->second->CheckIfLow() || iterator->second->GetTransitionType() == Transition::TransitionType::lowStart)
+        if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != Transition::TransitionType::lowStart)
         {
-            canBeDeduced = true;
+            canBeDeduced = false;
             break;
         }
     }

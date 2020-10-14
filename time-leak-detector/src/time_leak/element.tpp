@@ -25,13 +25,13 @@ const bool time_leak::Element<T>::WasAnalyzed()
 }
 
 template <class T>
-const map<string, T *> time_leak::Element<T>::GetInElements()
+map<string, T *> time_leak::Element<T>::GetInElements()
 {
     return this->inElements;
 }
 
 template <class T>
-const map<string, T *> time_leak::Element<T>::GetOutElements()
+map<string, T *> time_leak::Element<T>::GetOutElements()
 {
     return this->outElements;
 }

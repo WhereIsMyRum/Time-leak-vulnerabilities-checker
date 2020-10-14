@@ -23,6 +23,7 @@ app.post("/analyze", (request, response) => {
             if (res[1] == 'low') resultString.colors[res[0]] = 'red';
             else if (res[1] == 'lowEnd') resultString.colors[res[0]] = 'magenta';
             else if (res[1] == 'lowStart') resultString.colors[res[0]] = 'orange';
+            else if (res[1] == 'maxDuration') resultString.colors[res[0]] = 'green';
         };
     });
     response.send(resultString);

@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "create-nets": "node create_nets_files.js",
-    "dev": "set NODE_ENV=dev&&nodemon server.js"
+    "dev": "set NODE_ENV=dev&&nodemon server.js",
+    "test": "mocha test.js"
   },
   "repository": {
     "type": "git",
@@ -23,6 +23,8 @@
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "express-http-to-https": "^1.1.4",
+    "lodash": "^4.17.20",
+    "mocha": "^8.1.3",
     "nodemon": "^2.0.4"
   }
 }

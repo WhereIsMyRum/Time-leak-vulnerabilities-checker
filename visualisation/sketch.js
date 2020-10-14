@@ -103,6 +103,7 @@ class Shape {
         } else {
             push();
             stroke(this.color);
+            if (this.color != 'black') strokeWeight(4);
             callback(...args);
             pop();
         }

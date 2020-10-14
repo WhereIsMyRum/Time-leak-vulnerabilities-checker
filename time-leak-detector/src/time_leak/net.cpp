@@ -123,6 +123,8 @@ void time_leak::Net::RunAnalysis()
 
         this->analyzeNet(this->findStartPlace(), false);
     }
+
+    this->checkForSpecialCases();
 }
 
 template <class T>
@@ -162,6 +164,42 @@ void time_leak::Net::analyzeNet(time_leak::Place *startPlace, bool upwards)
         if (time_leak::ForwardQueue(placesQueue, transitionsQueue, upwards))
             changesMade();
     }
+}
+
+void time_leak::Net::checkForSpecialCases()
+{
+    for (auto iterator = this->highTransitions.begin(); iterator != this->highTransitions.end(); ++iterator)
+    {
+        this->checkIntervalOnlyCase(iterator->second);
+    }
+}
+
+void time_leak::Net::checkIntervalOnlyCase(time_leak::Transition *transition)
+{
+    if (transition->GetTransitionType() != Transition::TransitionType::low)
+        return;
+
+    map<string, time_leak::Place *> places = transition->GetOutElements();
+    for (auto it1 = places.begin(); it1 != places.end(); ++it1)
+    {
+        map<string, time_leak::Transition *> transitions = it1->second->GetOutElements();
+        for (auto it2 = transitions.begin(); it2 != transitions.end(); ++it2)
+        {
+            if (it2->second->CheckIfLow())
+            {
+                if (it2->second->GetInElements().size() > 1)
+                {
+                    transition->SetTransitionType(Transition::TransitionType::maxDuration);
+                }
+                else
+                {
+                    transition->SetTransitionType(Transition::TransitionType::low);
+                    return;
+                }
+            }
+        }
+    }
+
 }
 
 void time_leak::Net::PrintResults()
