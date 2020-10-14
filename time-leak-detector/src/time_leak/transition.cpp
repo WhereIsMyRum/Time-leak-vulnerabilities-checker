@@ -1,8 +1,4 @@
-#include <string>
-#include <iostream>
-
 #include "../../include/time_leak/transition.hpp"
-#include "../../include/time_leak/place.hpp"
 
 using namespace std;
 using namespace enums;

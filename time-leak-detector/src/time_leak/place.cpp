@@ -1,8 +1,3 @@
-#include <string>
-#include <iostream>
-#include <map>
-#include <iterator>
-
 #include "../../include/time_leak/place.hpp"
 
 using namespace std;

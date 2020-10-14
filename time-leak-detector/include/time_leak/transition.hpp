@@ -2,10 +2,14 @@
 #define TRANSITION
 
 #include <string>
+#include <iostream>
 #include <map>
 
 #include "element.hpp"
 #include "enums.hpp"
+
+#include "../../include/time_leak/place.hpp"
+
 
 class Place;
 

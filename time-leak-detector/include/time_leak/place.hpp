@@ -2,7 +2,9 @@
 #define PLACE
 
 #include <string>
+#include <iostream>
 #include <map>
+#include <iterator>
 
 #include "element.hpp"
 #include "transition.hpp"

@@ -5,7 +5,15 @@
 #include <map>
 
 #include "globals.hpp"
+#include "elementUniqueFifo.hpp"
 #include "../../include/rapidjson/document.h"
+
+namespace time_leak
+{
+    class Place;
+    class Transition;
+} // namespace time_leak
+
 
 namespace time_leak
 {
