@@ -68,7 +68,7 @@ bool time_leak::Transition::canDeduceStartTime()
     return canBeDeduced;
 }
 
-void time_leak::Transition::Analyze()
+bool time_leak::Transition::Analyze()
 {
     //cout << "Analyzing " << this->id << endl;
     TransitionType initialVal = this->transitionType;
@@ -78,43 +78,9 @@ void time_leak::Transition::Analyze()
     if (this->canDeduceStartTime())
         this->transitionType = this->transitionType == TransitionType::lowEnd ? TransitionType::low : TransitionType::lowStart;
 
-    if (initialVal != this->transitionType)
-        globals::ChangesMade();
     this->SetAnalyzed(true);
-}
 
-void time_leak::PopulateTransitions(rapidjson::Document &net)
-{
-    rapidjson::Value::ConstValueIterator iterator;
-    for (iterator = net["transitions"]["high"].Begin(); iterator != net["transitions"]["high"].End(); ++iterator)
-    {
-        globals::Transitions.insert(pair<string, time_leak::Transition *>(iterator->GetString(), new time_leak::Transition(iterator->GetString())));
-    }
-
-    for (iterator = net["transitions"]["low"].Begin(); iterator != net["transitions"]["low"].End(); ++iterator)
-    {
-        globals::Transitions.insert(pair<string, time_leak::Transition *>(iterator->GetString(), new time_leak::Transition(iterator->GetString(), false, enums::TransitionType::low)));
-    }
-}
-
-void time_leak::CreateTransitionsForwardLinks(rapidjson::Document &net)
-{
-    map<string, time_leak::Transition *>::iterator iterator;
-    for (iterator = globals::Transitions.begin(); iterator != globals::Transitions.end(); ++iterator)
-    {
-        const char *transitionKey = iterator->second->GetId().c_str();
-        for (rapidjson::SizeType i = 0; i < net["flows"]["transitions"][transitionKey].Size(); ++i)
-        {
-            string placeId = net["flows"]["transitions"][transitionKey][i].GetString();
-            placeId = globals::Places.find(placeId) == globals::Places.end() ? "end" : placeId;
-            iterator->second->AddOutElement(globals::Places.at(placeId));
-
-            time_leak::CreatePlaceBackwardLink(placeId, iterator->second);
-        }
-    }
-}
-
-void time_leak::CreateTransitionBackwardLink(string transitionId, time_leak::Place *place)
-{
-    globals::Transitions.at(transitionId)->AddInElement(place);
+    if (initialVal != this->transitionType)
+        return true;
+    return false;
 }

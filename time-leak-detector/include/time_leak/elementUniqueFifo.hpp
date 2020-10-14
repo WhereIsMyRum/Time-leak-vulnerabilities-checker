@@ -23,7 +23,7 @@ namespace time_leak
     };
 
     template <class T, class T2>
-    void ForwardQueue(T &queue1, T2 &queue2, bool direction);
+    bool ForwardQueue(T &queue1, T2 &queue2, bool direction);
 
 } // namespace time_leak
 

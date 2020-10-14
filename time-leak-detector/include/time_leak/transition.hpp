@@ -25,13 +25,8 @@ namespace time_leak
         enums::TransitionType GetTransitionType();
         bool IsHigh();
         bool CheckIfLow();
-        void Analyze();
+        bool Analyze();
     };
-
-    void PopulateTransitions(rapidjson::Document &net);
-    void CreateTransitionsForwardLinks(rapidjson::Document &net);
-    void CreateTransitionBackwardLink(string transitionId, time_leak::Place *place);
-
 } // namespace time_leak
 
 #endif
