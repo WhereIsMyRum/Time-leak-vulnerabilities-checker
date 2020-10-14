@@ -24,6 +24,11 @@ bool time_leak::Transition::IsHigh()
     return this->high;
 }
 
+bool time_leak::Transition::CheckIfLow()
+{
+    return !this->high || this->transitionType == TransitionType::low;
+}
+
 bool time_leak::Transition::canDeduceEndTime()
 {
     if (!this->IsHigh())

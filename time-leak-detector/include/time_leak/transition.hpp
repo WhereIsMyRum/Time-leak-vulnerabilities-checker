@@ -24,6 +24,7 @@ namespace time_leak
         Transition(std::string id, bool high = true, enums::TransitionType type = enums::TransitionType::high);
         enums::TransitionType GetTransitionType();
         bool IsHigh();
+        bool CheckIfLow();
         void Analyze();
     };
 

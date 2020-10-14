@@ -38,7 +38,7 @@ bool time_leak::Place::checkOutgoing()
 
     for (iterator = this->outElements.begin(); iterator != this->outElements.end(); ++iterator)
     {
-        if (!iterator->second->IsHigh() || iterator->second->GetTransitionType() == TransitionType::low || iterator->second->GetTransitionType() == TransitionType::lowStart)
+        if (iterator->second->CheckIfLow() || iterator->second->GetTransitionType() == TransitionType::lowStart)
         {
             canBeDeduced = true;
             break;
@@ -55,7 +55,7 @@ bool time_leak::Place::checkIngoing()
 
     for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
-        if (iterator->second->IsHigh() && iterator->second->GetTransitionType() != TransitionType::low && iterator->second->GetTransitionType() != TransitionType::lowEnd)
+        if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != TransitionType::lowEnd)
         {
             canBeDeduced = false;
             break;
