@@ -37,5 +37,9 @@
                 "p4"
             ]
         }
-    }
+    },
+    "results": [
+        "H1-high",
+        "H2-lowEnd"
+    ]
 }

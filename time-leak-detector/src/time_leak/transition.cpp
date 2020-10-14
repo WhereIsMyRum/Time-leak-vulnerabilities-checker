@@ -14,6 +14,11 @@ time_leak::Transition::TransitionType time_leak::Transition::GetTransitionType()
     return this->transitionType;
 }
 
+void time_leak::Transition::SetTransitionType(time_leak::Transition::TransitionType t)
+{
+    this->transitionType = t;
+}
+
 string time_leak::Transition::GetTransitionTypeString()
 {
     string transitionString;
@@ -30,6 +35,9 @@ string time_leak::Transition::GetTransitionTypeString()
             break;
         case TransitionType::lowStart:
             transitionString = "lowStart";
+            break;
+        case TransitionType::maxDuration:
+            transitionString = "maxDuration";
             break;
     }
 

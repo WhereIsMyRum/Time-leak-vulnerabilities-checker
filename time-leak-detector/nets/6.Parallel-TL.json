@@ -50,5 +50,8 @@
                 "p6"
             ]
         }
-    }
+    },
+    "results": [
+        "H1-maxDuration"
+    ]
 }

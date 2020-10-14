@@ -30,8 +30,8 @@ namespace time_leak
 
         const std::string GetId();
         const bool WasAnalyzed();
-        const std::map<std::string, T *> GetInElements();
-        const std::map<std::string, T *> GetOutElements();
+        std::map<std::string, T *> GetInElements();
+        std::map<std::string, T *> GetOutElements();
         const std::map<std::string, T *> GetElementsBasedOnDirection(bool direction);
 
         void AddInElement(T *element);

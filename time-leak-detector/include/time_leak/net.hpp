@@ -31,6 +31,8 @@ namespace time_leak
             void createTransitionBackwardLink(string transitionId, Place *place);
 
             void analyzeNet(Place *startPlace, bool upwards);
+            void checkForSpecialCases();
+            void checkIntervalOnlyCase(Transition *transition);
 
             template <class T>
             void resetAnalyzedFlag(T &Elements);

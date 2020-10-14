@@ -19,7 +19,7 @@ namespace time_leak
     public:
         enum TransitionType 
         {
-            high, low, lowStart, lowEnd
+            high, low, lowStart, lowEnd, maxDuration
         };
 
     private:
@@ -36,7 +36,7 @@ namespace time_leak
         bool CheckIfLow();
         bool Analyze();
         std::string GetTransitionTypeString();
-        
+        void SetTransitionType(TransitionType t);
 
     };
 } // namespace time_leak
