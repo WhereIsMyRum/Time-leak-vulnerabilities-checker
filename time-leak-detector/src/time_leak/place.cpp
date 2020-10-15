@@ -15,11 +15,15 @@ bool time_leak::Place::IsTimeDeducible()
 bool time_leak::Place::canTimeBeDeduced()
 {
     bool deducable = false;
+    this->parallelIn = false;
+    this->parallelOut = false;
 
     if (checkOutgoing())
         deducable = true;
     if (checkIngoing())
         deducable = true;
+    if (deducable)
+        deducable = checkParallelCase();
 
     return deducable;
 }
@@ -27,6 +31,7 @@ bool time_leak::Place::canTimeBeDeduced()
 bool time_leak::Place::checkOutgoing()
 {
     map<string, Transition *>::iterator iterator;
+    this->highOut = 0;
     bool canBeDeduced = this->outElements.size() > 0 ? true : false;
 
     for (iterator = this->outElements.begin(); iterator != this->outElements.end(); ++iterator)
@@ -34,7 +39,7 @@ bool time_leak::Place::checkOutgoing()
         if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != Transition::TransitionType::lowStart)
         {
             canBeDeduced = false;
-            break;
+            ++this->highOut;
         }
     }
 
@@ -44,6 +49,7 @@ bool time_leak::Place::checkOutgoing()
 bool time_leak::Place::checkIngoing()
 {
     map<string, Transition *>::iterator iterator;
+    this->highIn = 0;
     bool canBeDeduced = this->inElements.size() > 0 ? true : false;
 
     for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
@@ -51,10 +57,31 @@ bool time_leak::Place::checkIngoing()
         if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != Transition::TransitionType::lowEnd)
         {
             canBeDeduced = false;
-            break;
+            ++this->highIn;
         }
     }
     return canBeDeduced;
+}
+
+bool time_leak::Place::checkParallelCase()
+{
+    if ((this->inElements.size() == 1 && this->outElements.size() < 3) || (this->inElements.size() < 3 && this->outElements.size() == 1))
+        return true;
+
+    if ((this->highIn > 1 && this->highOut > 0 && this->outElements.size() > 0))
+    {
+        this->parallelIn = true;
+        return false;
+
+    }
+
+    if ((this->highOut > 1 && this->highIn >= 0 && this->inElements.size() > 0))
+    {
+        this->parallelOut = true;
+        return false;
+    }
+
+    return true;
 }
 
 bool time_leak::Place::Analyze()
