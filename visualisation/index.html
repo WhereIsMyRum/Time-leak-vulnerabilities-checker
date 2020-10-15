@@ -24,24 +24,34 @@
 
     </div>
     <div class="input-holder">
-        <select onchange="selectChange(this)" name="nets" id="nets-select">
-            <option value="" disabled selected>Select your option</option>
-        </select>
+        <div class="selects">
+            <p class="label">Select from predefined</p>
+            <select onchange="selectPredefinedChange(this)" name="nets" id="nets-select">
+                <option value="" disabled selected>Select your option</option>
+            </select>
+            <p class="label">Select from saved</p>
+            <select onchange="selectCustomChange(this)" name="nets" id="nets-custom-select">
+                <option value="" disabled selected>Select your option</option>
+            </select>
+        </div>
         or
         <div id="net-input-holder">
             <textarea id="net-input"></textarea>
         </div>
         <div id='color-codes'>
             <div class="legend-header">Color codes</div>
-            <div class="color-codes-wrapper"><div class="square red"></div><p>low activity</p></div>
-            <div class="color-codes-wrapper"><div class="square magenta"></div><p>known end time</p></div>
-            <div class="color-codes-wrapper"><div class="square orange"></div><p>known start time</p></div>
-            <div class="color-codes-wrapper"><div class="square green"></div><p>known max duration</p></div>
+            <div class="color-codes-wrapper"><div class="square low"></div><p>low activity</p></div>
+            <div class="color-codes-wrapper"><div class="square lowEnd"></div><p>known end time</p></div>
+            <div class="color-codes-wrapper"><div class="square lowStart"></div><p>known start time</p></div>
+            <div class="color-codes-wrapper"><div class="square maxDuration"></div><p>known max duration</p></div>
+            <div class="color-codes-wrapper"><div class="square parallel"></div><p>parallel to at least one low</p></div>
         </div>
     </div>
     <div class="fn-buttons">
         <button onclick="clearForm()" id="clear-btn">Clear</button>
         <button onClick="analyze()" id="submit-btn">Submit</button>
+        <button onClick="saveNetToLocalStorage()" id="save-btn">Save</button>
+        <button onClick="deleteNetFromLocalStorage()" id="delete-btn">Delete current</button>
     </div>
     <script>
         function setup() {

@@ -3,11 +3,12 @@ const netHolder = document.getElementById('net-input');
 const invalidJson = document.getElementById('invalid-json-notification');
 const defaultNet = { "places": [], "transitions": { "high": [], "low": [] }, "flows": { "places": {}, "transitions": {} } };
 let net = defaultNet;
-netHolder.innerHTML = JSON.stringify(net, undefined, 4);
+setNetToDefault();
 
 
 window.onload = () => {
     fetchNetsData();
+    populateSavedNets();
     netHolder.addEventListener('keyup', update);
 };
 
@@ -32,9 +33,9 @@ function reRender(tmpNet) {
 
 function clearForm() {
     if (window.confirm('You sure you want to clear?')) {
-        netHolder.value = JSON.stringify(defaultNet, undefined, 4);
-        setSelectToDefault();
-        update();
+        setNetToDefault();
+        resetSelectById('nets-select');
+        resetSelectById('nets-custom-select');
     } else {
         update();
     }
@@ -48,6 +49,16 @@ function fetchNetsData() {
         .then(data => addToSelect(data));
 }
 
+function populateSavedNets() {
+    const customSelect = document.getElementById('nets-custom-select');
+    Object.entries(localStorage).sort().forEach(([key, value]) => {
+        const option = document.createElement('option');
+        option.value = key;
+        option.text = key;
+        customSelect.append(option);
+    })
+}
+
 function analyze() {
     const data = {
         "custom": JSON.parse(netHolder.value)
@@ -59,13 +70,13 @@ function analyze() {
             'Content-Type': 'application/json'
         }
     })
-    .then(res => res.json())
-    .then(data => reRender(data));
+        .then(res => res.json())
+        .then(data => reRender(data));
 }
 
 function addToSelect(data) {
     const select = document.getElementById('nets-select');
-    data.forEach( net => {
+    data.forEach(net => {
         const option = document.createElement('option');
         option.value = net.value;
         option.text = net.text;
@@ -73,14 +84,68 @@ function addToSelect(data) {
     });
 }
 
-function selectChange(element) {
+function selectPredefinedChange(element) {
     fetch(`/nets/${element.value}`)
-    .then(res => res.json())
-    .then(data => netHolder.value = JSON.stringify(data, undefined, 4))
-    .then(() => update());
+        .then(res => res.json())
+        .then(data => netHolder.value = JSON.stringify(data, undefined, 4))
+        .then(() => update());
+    resetSelectById('nets-custom-select');
 }
 
-function setSelectToDefault() {
-    const select = document.getElementById('nets-select');
-    select.selectedIndex = 0;
+function selectCustomChange(element) {
+    netHolder.value = localStorage.getItem(element.value);
+    update();
+    resetSelectById('nets-select');
+}
+
+function resetSelectById(id) {
+    const select = document.getElementById(id);
+    if (select) select.value = '';
+}
+
+function saveNetToLocalStorage() {
+    try {
+        JSON.parse(netHolder.value);
+    } catch (e) {
+        alert("The net you want is invalid!");
+        return;
+    }
+
+    const netName = prompt("Enter your net name:", '');
+    if (netName !== null && netName !== "") {
+        if (localStorage.getItem(netName)) {
+            alert("A net with that name exists! Select a different name.");
+            return;
+        }
+        localStorage.setItem(netName, netHolder.value);
+        appendToSavedNets(netName);
+    }
+}
+
+function appendToSavedNets(netName) {
+    const customSelect = document.getElementById('nets-custom-select');
+    const option = document.createElement('option');
+    option.value = netName;
+    option.key = netName;
+    option.innerHTML = netName;
+    customSelect.append(option);
+}
+
+function deleteNetFromLocalStorage() {
+    const customSelect = document.getElementById('nets-custom-select');
+    if (customSelect.value != '') {
+        localStorage.removeItem(customSelect.value);
+        customSelect.childNodes.forEach(option => {
+            if (option.value == customSelect.value) {
+                option.remove();
+            }
+        })
+    }
+    setNetToDefault();
+    resetSelectById('nets-custom-select');
+}
+
+function setNetToDefault() {
+    netHolder.value = JSON.stringify(defaultNet, undefined, 4);
+    update();
 }
