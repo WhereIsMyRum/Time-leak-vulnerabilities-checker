@@ -8,8 +8,9 @@ canvas {
 }
 
 #net-input-holder {
-    display: flex;;
+    display: flex;
     justify-content: center;
+    flex-direction: column;
 }
 
 #net-input {
@@ -27,7 +28,7 @@ canvas {
 }
 
 .fn-buttons button {
-    margin: 0 5px;
+    margin: 0 5px 100px;
 }
 
 #invalid-json-notification {
@@ -78,18 +79,26 @@ canvas {
     font-size: 18px;
 }
 
-.red {
+.label {
+    margin-bottom: 2px;
+}
+
+.low {
     background-color: #FF4D4D;
 }
 
-.orange {
+.lowStart {
     background-color: #FFC04D;
 }
 
-.magenta {
+.lowEnd {
     background-color: #FF4DFF;
 }
 
-.green {
+.maxDuration {
     background-color: #008000;
+}
+
+.parallel {
+    background-color: #800080;
 }

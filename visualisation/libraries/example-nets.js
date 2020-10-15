@@ -210,7 +210,7 @@ const nets = {
                 "H3": ["p4"]
             }
         },
-        "results": ["H1-knowIfNotExecuted"]
+        "results": ["H1-parallel", "H2-parallel", "H3-high"]
     },
     "10\.Combined-Multiple-Layers": {
         "places": ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p10", "p11"],
@@ -243,7 +243,7 @@ const nets = {
                 "H4": ["p9"]
             }
         },
-        "results": ["H1-low", "H2-low", "H3-low", "H4-low"]
+        "results": ["H1-lowStart", "H2-lowEnd", "H3-low", "H4-lowEnd"]
     },
     "11\.Split-Start-No-Split-Places": {
         "places": ["p1", "p2", "p3", "p4", "p5"],

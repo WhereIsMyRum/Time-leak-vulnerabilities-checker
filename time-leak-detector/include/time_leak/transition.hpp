@@ -19,11 +19,12 @@ namespace time_leak
     public:
         enum TransitionType 
         {
-            high, low, lowStart, lowEnd, maxDuration
+            high, low, lowStart, lowEnd, maxDuration, parallel
         };
 
     private:
         bool highT;
+        bool isParallel = false;
         bool canDeduceEndTime();
         bool canDeduceStartTime();
         void analyzeIngoing();
