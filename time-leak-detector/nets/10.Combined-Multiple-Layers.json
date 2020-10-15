@@ -95,9 +95,9 @@
         }
     },
     "results": [
-        "H1-low",
-        "H2-low",
+        "H1-lowStart",
+        "H2-lowEnd",
         "H3-low",
-        "H4-low"
+        "H4-lowEnd"
     ]
 }

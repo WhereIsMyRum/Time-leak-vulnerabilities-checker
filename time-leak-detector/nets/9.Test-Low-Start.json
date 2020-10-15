@@ -49,6 +49,8 @@
         }
     },
     "results": [
-        "H1-knowIfNotExecuted"
+        "H1-parallel",
+        "H2-parallel",
+        "H3-high"
     ]
 }
