@@ -20,7 +20,6 @@ namespace time_leak
             map<std::string, time_leak::Transition *> highTransitions;
             ElementUniqueFifo<Place *> placesQueue;
             ElementUniqueFifo<Transition *> transitionsQueue;
-            bool changed;
 
         private:
             void populatePlaces();
@@ -30,23 +29,14 @@ namespace time_leak
             void createTransitionsForwardLinks(map<string, Transition *> transitions);
             void createTransitionBackwardLink(string transitionId, Place *place);
 
-            void analyzeNet(Place *startPlace, bool upwards);
-            void checkForSpecialCases();
-            void checkIntervalOnlyCase(Transition *transition);
-
-            template <class T>
-            void resetAnalyzedFlag(T &Elements);
-
-            Place *findStartPlace();
-            bool wasChanged();
-            void changesMade();
-            void resetChanged();
-
         public:
             Net(rapidjson::Document net);
+            map<std::string, time_leak::Place *>& GetPlaces();
+            map<std::string, time_leak::Transition *>& GetLowTransitions();
+            map<std::string, time_leak::Transition *>& GetHighTransitions();
+            ElementUniqueFifo<Place *>& GetPlacesQueue();
+            ElementUniqueFifo<Transition *>& GetTransitionsQueue();
             void PrintNet();
-            void RunAnalysis();
-            void PrintResults();
     };
 }
 

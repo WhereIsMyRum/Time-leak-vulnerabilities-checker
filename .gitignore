@@ -103,5 +103,9 @@ dist
 # TernJS port file
 .tern-port
 
+# JS
+*.min.js
+output.json
+
 # Cpp
 *.exe
