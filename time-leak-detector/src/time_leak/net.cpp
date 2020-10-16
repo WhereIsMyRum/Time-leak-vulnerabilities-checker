@@ -5,7 +5,6 @@ using namespace std;
 time_leak::Net::Net(rapidjson::Document net)
 {
     this->net.CopyFrom(net, this->net.GetAllocator());
-    this->changed = true;
 
     populatePlaces();
     populateTransitions();
@@ -107,128 +106,27 @@ void time_leak::Net::PrintNet()
     places.at("end")->Print();
 }
 
-void time_leak::Net::RunAnalysis()
+map<std::string, time_leak::Place *>& time_leak::Net::GetPlaces()
 {
-    while(this->wasChanged())
-    {
-        this->resetChanged();
-        this->analyzeNet(places.at("end"), true);
-
-        this->transitionsQueue.Clear();
-        this->placesQueue.Clear();
-
-        this->resetAnalyzedFlag(this->places);
-        this->resetAnalyzedFlag(this->highTransitions);
-        this->resetAnalyzedFlag(this->lowTransitions);
-
-        this->analyzeNet(this->findStartPlace(), false);
-    }
-
-    this->checkForSpecialCases();
+    return this->places;
 }
 
-template <class T>
-void time_leak::Net::resetAnalyzedFlag(T &Elements)
+map<std::string, time_leak::Transition *>& time_leak::Net::GetLowTransitions()
 {
-    for (auto iterator = Elements.begin(); iterator != Elements.end(); ++iterator)
-    {
-        iterator->second->SetAnalyzed(false);
-    }
+    return this->lowTransitions;
 }
 
-time_leak::Place *time_leak::Net::findStartPlace()
+map<std::string, time_leak::Transition *>& time_leak::Net::GetHighTransitions()
 {
-    time_leak::Place *p;
-
-    for (auto iterator = places.begin(); iterator != places.end(); ++iterator)
-    {
-        if (iterator->second->GetInElements().size() == 0)
-        {
-            p = iterator->second;
-            break;
-        }
-    }
-    return p;
+    return this->highTransitions;
 }
 
-
-void time_leak::Net::analyzeNet(time_leak::Place *startPlace, bool upwards)
+time_leak::ElementUniqueFifo<time_leak::Place *>& time_leak::Net::GetPlacesQueue()
 {
-    startPlace->Analyze();
-    startPlace->Traverse(startPlace->GetElementsBasedOnDirection(upwards), transitionsQueue);
-
-    while (placesQueue.Size() > 0 || transitionsQueue.Size() > 0)
-    {
-        if (time_leak::ForwardQueue(transitionsQueue, placesQueue, upwards))
-            changesMade();
-        if (time_leak::ForwardQueue(placesQueue, transitionsQueue, upwards))
-            changesMade();
-    }
+    return this->placesQueue;
 }
 
-void time_leak::Net::checkForSpecialCases()
+time_leak::ElementUniqueFifo<time_leak::Transition *>& time_leak::Net::GetTransitionsQueue()
 {
-    for (auto iterator = this->highTransitions.begin(); iterator != this->highTransitions.end(); ++iterator)
-    {
-        this->checkIntervalOnlyCase(iterator->second);
-    }
-}
-
-void time_leak::Net::checkIntervalOnlyCase(time_leak::Transition *transition)
-{
-    if (transition->GetTransitionType() != Transition::TransitionType::low)
-        return;
-
-    map<string, time_leak::Place *> places = transition->GetOutElements();
-    for (auto it1 = places.begin(); it1 != places.end(); ++it1)
-    {
-        map<string, time_leak::Transition *> transitions = it1->second->GetOutElements();
-        for (auto it2 = transitions.begin(); it2 != transitions.end(); ++it2)
-        {
-            if (it2->second->CheckIfLow())
-            {
-                if (it2->second->GetInElements().size() > 1)
-                {
-                    transition->SetTransitionType(Transition::TransitionType::maxDuration);
-                }
-                else
-                {
-                    transition->SetTransitionType(Transition::TransitionType::low);
-                    return;
-                }
-            }
-        }
-    }
-
-}
-
-void time_leak::Net::PrintResults()
-{
-    map<string, time_leak::Transition *>::iterator iterator;
-    for (iterator = highTransitions.begin(); iterator != highTransitions.end(); ++iterator)
-    {
-        cout << iterator->second->GetId() << "-" << iterator->second->GetTransitionTypeString() << endl;
-    }
-
-    /*map<string, time_leak::Place *>::iterator iterator2;
-    for (iterator2 = globals::Places.begin(); iterator2 != globals::Places.end(); ++iterator2)
-    {
-        if (iterator2->second->IsTimeDeducible())
-            cout << iterator2->second->GetId() << " is timeDeducible." << endl;
-    }*/
-}
-
-bool time_leak::Net::wasChanged()
-{
-    return this->changed;
-}
-
-void time_leak::Net::changesMade()
-{
-    this->changed = true;
-}
-
-void time_leak::Net::resetChanged()
-{
-    this->changed = false;
+    return this->transitionsQueue;
 }

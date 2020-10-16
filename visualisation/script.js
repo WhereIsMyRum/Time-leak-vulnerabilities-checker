@@ -20,6 +20,7 @@ function update() {
         if (netHolder.classList.contains('red-focus')) netHolder.classList.remove('red-focus');
         reRender(tmpNet);
     } catch (e) {
+        console.log(e);
         invalidJson.style.visibility = "visible";
         netHolder.classList.add('red-focus');
     }
