@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const fs = require('fs');
 const nets = require('../visualisation/libraries/example-nets').nets
-const netName = '21\.Massive-x16';
+const netName = '22\.Massive-x32';
 
 const net = _.cloneDeep(nets[netName]);
 const pPlus = Number(net.places[net.places.length - 1].substr(1)) - 1;
