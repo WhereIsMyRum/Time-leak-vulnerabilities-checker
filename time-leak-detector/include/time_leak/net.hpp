@@ -36,6 +36,8 @@ namespace time_leak
             map<std::string, time_leak::Transition *>& GetHighTransitions();
             ElementUniqueFifo<Place *>& GetPlacesQueue();
             ElementUniqueFifo<Transition *>& GetTransitionsQueue();
+            void RemovePlace(std::string placeId);
+            void RemoveTransition(std::string transitionId);
             void PrintNet();
     };
 }

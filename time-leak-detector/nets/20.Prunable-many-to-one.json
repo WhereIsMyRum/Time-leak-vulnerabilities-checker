@@ -5,54 +5,66 @@
         "p3",
         "p4",
         "p5",
-        "p6"
+        "p6",
+        "p7"
     ],
     "transitions": {
+        "high": [
+            "H1"
+        ],
         "low": [
             "L1",
             "L2",
-            "L3"
-        ],
-        "high": [
-            "H1"
+            "L3",
+            "L4",
+            "L5"
         ]
     },
     "flows": {
         "places": {
             "p1": [
-                "L1"
+                "L1",
+                "L2"
             ],
             "p2": [
-                "H1"
+                "L3"
             ],
             "p3": [
                 "L3"
             ],
             "p4": [
-                "L2"
+                "L4"
             ],
             "p5": [
-                "L3"
+                "H1"
+            ],
+            "p6": [
+                "L5"
             ]
         },
         "transitions": {
             "L1": [
-                "p2",
-                "p4"
+                "p2"
             ],
             "L2": [
-                "p5"
-            ],
-            "H1": [
                 "p3"
             ],
             "L3": [
+                "p4"
+            ],
+            "L4": [
+                "p5"
+            ],
+            "H1": [
                 "p6"
+            ],
+            "L5": [
+                "p7"
             ]
         }
     },
     "results": [
-        "L2 oneToOne",
-        "H1-maxDuration"
+        "L3 manyToOneSingle",
+        "H1-low"
     ]
 }

@@ -37,6 +37,18 @@ map<string, T *> time_leak::Element<T>::GetOutElements()
 }
 
 template <class T>
+void time_leak::Element<T>::RemoveInElement(string elementId)
+{
+    this->inElements.erase(elementId);
+}
+
+template<class T>
+void time_leak::Element<T>::RemoveOutElement(string elementId)
+{
+    this->outElements.erase(elementId);
+}
+
+template <class T>
 const map<string, T *> time_leak::Element<T>::GetElementsBasedOnDirection(bool direction)
 {
     return direction ? this->inElements : this->outElements;

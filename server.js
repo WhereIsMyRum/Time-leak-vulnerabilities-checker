@@ -16,14 +16,18 @@ childProcess.execSync('chmod a+x /app/time-leak-detector/main');
 
 app.post("/analyze", (request, response) => {
     let results = childProcess.execFileSync(`${__dirname}/time-leak-detector/main`, [JSON.stringify(request.body.custom)]).toString().split('\n');
+    console.log(results);
     results = results.map(result => result.replace('\r', ''));
     const resultString = JSON.parse(JSON.stringify(request.body.custom));
     resultString.colors = {};
     results.forEach(result => {
-        const res = result.split('-');
-        if (res && res[0].startsWith('H')) {
-            resultString.colors[res[0]] = getColorFromTransitionType(res[1]);
-        };
+        if (result.includes('-')) {
+            const res = result.split('-');
+            if (res && res[0].startsWith('H')) {
+                resultString.colors[res[0]] = getColorFromTransitionType(res[1]);
+            };
+        }
+        
     });
     response.send(resultString);
 });
@@ -67,6 +71,11 @@ app.listen(PORT, () => {
 });
 
 const getColorFromTransitionType = (transitionType) => {
+    if (transitionType.includes('-'))
+    {
+        return transitionType.split('-').map(color => colorTransitionMap[color]);
+    }
+
     return colorTransitionMap[transitionType];
 }
 

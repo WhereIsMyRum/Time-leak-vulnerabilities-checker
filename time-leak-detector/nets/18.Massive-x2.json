@@ -1295,6 +1295,8 @@
         }
     },
     "results": [
+        "L12 oneToOne",
+        "L56 oneToOne",
         "H1-lowEnd",
         "H10-lowEnd",
         "H11-maxDuration",
