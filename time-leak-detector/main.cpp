@@ -25,11 +25,16 @@ int main(int argc, char *argv[])
     auto stop = std::chrono::high_resolution_clock::now();
     auto creationDuration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start); 
 
-    time_leak::NetAnalyzer nAnalyzer;
+    time_leak::NetAnalyzer nAnalyzer1;
     start = std::chrono::high_resolution_clock::now();
-    nAnalyzer.RunAnalysis(*n);
+    nAnalyzer1.RunAnalysis(*n);
     stop = std::chrono::high_resolution_clock::now();
     auto analysisNoPruningDuration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+    int numberOfPlacesWithoutPruning = n->GetPlaces().size();
+    int numberOfLowWithoutPruning = n->GetLowTransitions().size();
+
+    n = new time_leak::Net(time_leak::NetParser::ParseNet(argv[1]));
 
     time_leak::NetPruner nPruner;
     start = std::chrono::high_resolution_clock::now();
@@ -37,11 +42,19 @@ int main(int argc, char *argv[])
     stop = std::chrono::high_resolution_clock::now();
     auto pruningDuration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start); 
 
+    int numberOfPlacesAfterPruning = n->GetPlaces().size();
+    int numberOfLowAfterPruning = n->GetLowTransitions().size();
+
+    time_leak::NetAnalyzer nAnalyzer2;
     start = std::chrono::high_resolution_clock::now();
-    nAnalyzer.RunAnalysis(*n);
+    nAnalyzer2.RunAnalysis(*n);
     stop = std::chrono::high_resolution_clock::now();
     auto analysisPruningDuration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start); 
 
+    cout << "Number of places without pruning: " << numberOfPlacesWithoutPruning << endl;
+    cout << "Number of places after pruning: " << numberOfPlacesAfterPruning << endl;
+    cout << "Number of low transitions without pruning: " << numberOfLowWithoutPruning << endl;
+    cout << "Number of low transitions after pruning: " << numberOfLowAfterPruning << endl;
     cout << "creation: " << creationDuration.count() << endl;
     cout << "analysis w/o pruning: " << analysisNoPruningDuration.count() << endl;
     cout << "pruning: " <<  pruningDuration.count() << endl;
