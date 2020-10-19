@@ -130,3 +130,20 @@ time_leak::ElementUniqueFifo<time_leak::Transition *>& time_leak::Net::GetTransi
 {
     return this->transitionsQueue;
 }
+
+void time_leak::Net::RemovePlace(string placeId)
+{
+    this->places.erase(placeId);
+}
+
+void time_leak::Net::RemoveTransition(string transitionId)
+{
+    if (this->lowTransitions.find(transitionId) != this->lowTransitions.end())
+    {
+        this->lowTransitions.erase(transitionId);
+    }
+    else
+    {
+        this->highTransitions.erase(transitionId);
+    }
+};
