@@ -72,7 +72,6 @@ bool time_leak::Place::checkParallelCase()
     {
         this->parallelIn = true;
         return false;
-
     }
 
     if ((this->highOut > 1 && this->highIn >= 0 && this->inElements.size() > 0))

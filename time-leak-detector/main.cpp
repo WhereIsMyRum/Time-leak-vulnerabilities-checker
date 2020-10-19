@@ -11,6 +11,7 @@
 #include "include/time_leak/net.hpp"
 #include "include/time_leak/netParser.hpp"
 #include "include/time_leak/netAnalyzer.hpp"
+#include "include/time_leak/netPruner.hpp"
 
 using namespace std;
 
@@ -19,6 +20,11 @@ int main(int argc, char *argv[])
 
     time_leak::NetParser::CheckArguments(argc);
     time_leak::Net *n = new time_leak::Net(time_leak::NetParser::ParseNet(argv[1]));
+
+    time_leak::NetPruner nPruner;
+    nPruner.PruneNet(n);
+
+    //n->PrintNet();
 
     time_leak::NetAnalyzer nAnalyzer;
     nAnalyzer.RunAnalysis(*n);
