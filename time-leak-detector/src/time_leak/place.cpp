@@ -7,92 +7,86 @@ time_leak::Place::Place(string id)
 {
 }
 
-bool time_leak::Place::IsTimeDeducible()
+bool time_leak::Place::GetEndTimeDeducible()
 {
-    return this->timeDeducible;
+    return this->endTimeDeducible;
 }
 
-bool time_leak::Place::canTimeBeDeduced()
+bool time_leak::Place::GetStartTimeDeducible()
 {
-    bool deducable = false;
-    this->parallelIn = false;
-    this->parallelOut = false;
-
-    if (checkOutgoing())
-        deducable = true;
-    if (checkIngoing())
-        deducable = true;
-    if (deducable)
-        deducable = checkParallelCase();
-
-    return deducable;
+    return this->startTimeDeducible;
 }
 
-bool time_leak::Place::checkOutgoing()
+bool time_leak::Place::isEndTimeDeducible()
 {
-    map<string, Transition *>::iterator iterator;
+    if (this->inElements.size() == 0 || this->outElements.size() == 0)
+        return false;
+
+    if (this->highOut == 0)
+        return true;
+
+    return false;
+}
+
+bool time_leak::Place::isStartTimeDeducible()
+{
+    if (this->inElements.size() == 0 || this->outElements.size() == 0)
+        return false;
+
+    if (this->highIn == 0)
+    {
+        if (this->highOut == 0)
+            return true;
+
+        if (this->highOut < 2)
+            return true;
+    }
+
+    return false;
+}
+
+void time_leak::Place::canTimeBeDeduced()
+{
+
+    this->endTimeDeducible = isEndTimeDeducible();
+    this->startTimeDeducible = isStartTimeDeducible();
+}
+
+void time_leak::Place::countHighInAndHighOut()
+{
+    this->highIn = 0;
     this->highOut = 0;
-    bool canBeDeduced = this->outElements.size() > 0 ? true : false;
 
-    for (iterator = this->outElements.begin(); iterator != this->outElements.end(); ++iterator)
+    for (auto iterator = this->outElements.begin(); iterator != this->outElements.end(); ++iterator)
     {
         if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != Transition::TransitionType::lowStart)
         {
-            canBeDeduced = false;
-            ++this->highOut;
+            ++highOut;
         }
     }
 
-    return canBeDeduced;
-}
-
-bool time_leak::Place::checkIngoing()
-{
-    map<string, Transition *>::iterator iterator;
-    this->highIn = 0;
-    bool canBeDeduced = this->inElements.size() > 0 ? true : false;
-
-    for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
+    for (auto iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
         if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != Transition::TransitionType::lowEnd)
         {
-            canBeDeduced = false;
-            ++this->highIn;
+            highIn++;
         }
     }
-    return canBeDeduced;
-}
-
-bool time_leak::Place::checkParallelCase()
-{
-    if ((this->inElements.size() == 1 && this->outElements.size() < 3) || (this->inElements.size() < 3 && this->outElements.size() == 1))
-        return true;
-
-    if ((this->highIn > 1 && this->highOut > 0 && this->outElements.size() > 0))
-    {
-        this->parallelIn = true;
-        return false;
-    }
-
-    if ((this->highOut > 1 && this->highIn >= 0 && this->inElements.size() > 0))
-    {
-        this->parallelOut = true;
-        return false;
-    }
-
-    return true;
 }
 
 bool time_leak::Place::Analyze()
 {
     //cout << "Analyzing " << this->id << endl;
-    bool initialVal = this->timeDeducible;
-    if (this->canTimeBeDeduced())
-        this->timeDeducible = true;
+    bool initialValEnd = this->endTimeDeducible;
+    bool initalValStart = this->startTimeDeducible;
+
+    countHighInAndHighOut();
+    canTimeBeDeduced();
 
     this->SetAnalyzed(true);
 
-    if (initialVal != this->timeDeducible)
+    if (initialValEnd != this->endTimeDeducible || initalValStart != this->startTimeDeducible)
         return true;
+
     return false;
 }

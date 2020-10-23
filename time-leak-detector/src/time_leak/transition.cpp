@@ -69,13 +69,9 @@ bool time_leak::Transition::canDeduceEndTime()
 
     for (iterator = this->outElements.begin(); iterator != this->outElements.end(); ++iterator)
     {
-        if (iterator->second->IsTimeDeducible())
+        if (iterator->second->GetEndTimeDeducible())
         {
             canBeDeduced = true;
-        }
-        if (iterator->second->parallelIn)
-        {
-            this->isParallel = true;
         }
     }
 
@@ -94,13 +90,9 @@ bool time_leak::Transition::canDeduceStartTime()
 
     for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
-        if (!iterator->second->IsTimeDeducible())
+        if (!iterator->second->GetStartTimeDeducible())
         {
             canBeDeduced = false;
-        }
-        if (iterator->second->parallelOut)
-        {
-            this->isParallel = true;
         }
     }
     return canBeDeduced;
