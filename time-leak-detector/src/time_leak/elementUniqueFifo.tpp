@@ -60,7 +60,19 @@ bool time_leak::ForwardQueue(T &queue1, T2 &queue2, bool direction)
             element->Traverse(element->GetElementsBasedOnDirection(direction), queue2);
         }
         else
+        {
+            auto element = queue1.Front();
+            auto elements = element->GetElementsBasedOnDirection(!direction);
+            for (auto iterator = elements.begin(); iterator != elements.end(); ++iterator) 
+            {
+                if (!iterator->second->WasAnalyzed())
+                {
+                    iterator->second->Analyze();
+                    break;
+                }
+            }
             queue1.Shift();
+        }
     }
 
     return changesMade;
