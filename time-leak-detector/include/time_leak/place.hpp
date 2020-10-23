@@ -21,17 +21,20 @@ namespace time_leak
 
     private:
         bool timeDeducible = false;
-        bool canTimeBeDeduced();
-        bool checkOutgoing();
-        bool checkIngoing();
+        bool endTimeDeducible = false;
+        bool startTimeDeducible = false;
+        void canTimeBeDeduced();
         void analyzeIngoing();
-        bool checkParallelCase();
+        bool isEndTimeDeducible();
+        bool isStartTimeDeducible();
+        void countHighInAndHighOut();
 
     public:
         bool parallelIn = false;
         bool parallelOut = false;
         Place(std::string id);
-        bool IsTimeDeducible();
+        bool GetEndTimeDeducible();
+        bool GetStartTimeDeducible();
         bool Analyze();
     };
 

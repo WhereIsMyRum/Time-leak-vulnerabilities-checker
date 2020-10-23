@@ -210,7 +210,7 @@ const nets = {
                 "H3": ["p4"]
             }
         },
-        "results": ["H1-parallel", "H2-parallel", "H3-high"]
+        "results": ["H1-high", "H2-high", "H3-high"]
     },
     "10\.Combined-Multiple-Layers": {
         "places": ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p10", "p11"],
@@ -587,8 +587,8 @@ const nets = {
             "H13-lowEnd",
             "H14-low",
             "H15-low",
-            "H16-parallel",
-            "H17-parallel",
+            "H16-high",
+            "H17-high",
             "H18-lowEnd",
             "H19-lowStart",
             "H2-low",
@@ -626,8 +626,8 @@ const nets = {
             "H13-lowEnd",
             "H14-low",
             "H15-low",
-            "H16-parallel",
-            "H17-parallel",
+            "H16-high",
+            "H17-high",
             "H18-lowEnd",
             "H19-lowStart",
             "H2-low",
@@ -664,8 +664,8 @@ const nets = {
             "H48-low",
             "H49-low",
             "H5-maxDuration",
-            "H50-parallel",
-            "H51-parallel",
+            "H50-high",
+            "H51-high",
             "H52-lowEnd",
             "H53-lowStart",
             "H54-lowEnd",
