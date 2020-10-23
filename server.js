@@ -17,6 +17,7 @@ app.post("/analyze", (request, response) => {
     console.log(results);
     results = results.map(result => result.replace('\r', ''));
     const resultString = JSON.parse(JSON.stringify(request.body.custom));
+    delete resultString['results'];
     resultString.colors = {};
     results.forEach(result => {
         if (result.includes('-')) {
@@ -59,7 +60,9 @@ app.get("/nets", (request, response) => {
 });
 
 app.get("/nets/:netFile", (request, response) => {
-    response.sendFile(`${__dirname}/time-leak-detector/nets/${request.params.netFile}`);
+    const file = JSON.parse(fs.readFileSync(`${__dirname}/time-leak-detector/nets/${request.params.netFile}`));
+    delete file['results'];
+    response.send(file);
 })
 
 
