@@ -64,15 +64,103 @@ function analyze() {
     const data = {
         "custom": JSON.parse(netHolder.value)
     }
-    fetch('/analyze', {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-            'Content-Type': 'application/json'
+    const valid = validateData(data.custom);
+    if (valid.result) {
+        fetch('/analyze', {
+            method: "POST",
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => reRender(data));
+    } else {
+        console.log(valid);
+        alert(`The net you\'re trying to submit is incorrect:\n ${valid.issues.map(issue => issue).join('\n')}`);
+    }
+}
+
+function validateData(data) {
+    const valid = {};
+    let transitionsValues = [];
+    let placesValues = [];
+    let placesNoInput = [];
+    const placesNoOutput = [];
+
+    valid.result = true;
+    valid.issues = [];
+    Object.entries(data.flows.transitions).forEach(([key, value]) => {
+        transitionValues = transitionsValues.concat(value);
+    });
+    Object.entries(data.flows.transitions).forEach(([key, value]) => {
+        transitionsValues = transitionsValues.concat(value);
+    });
+
+    Object.entries(data.flows.places).forEach(([key, value]) => {
+        placesValues = placesValues.concat(value);
+    });
+
+    data.places.forEach(place => {
+        if (!data.flows.places[place] || data.flows.places[place].length == 0) {
+            placesNoOutput.push(place);
         }
-    })
-        .then(res => res.json())
-        .then(data => reRender(data));
+        if (!transitionsValues.includes(place)) {
+            placesNoInput.push(place);
+        }
+    });
+
+    if (placesNoInput.length > 1) {
+        valid.result = false;
+        valid.issues = valid.issues.concat([`more than 1 place has no input: ${placesNoInput}`]);
+    }
+
+    if (placesNoOutput.length > 1) {
+        valid.result = false;
+        valid.issues = valid.issues.concat([`more than 1 place has no output: ${placesNoOutput}`]);
+    }
+
+    if (placesNoInput.length == 0) {
+        valid.result = false;
+        valid.issues = valid.issues.concat(['No start place']);
+    }
+
+    if (placesNoOutput.length == 0) {
+        valid.result = false;
+        valid.issues = valid.issues.concat(['No end place']);
+    }
+
+    placesNoInput.forEach(place => {
+        if (placesNoOutput.includes(place)) {
+            valid.result = false;
+            valid.issues = valid.issues.concat([`${place} has no start and no end transitions`]);
+        }
+    });
+
+    data.transitions.low.forEach(transition => {
+        if (!data.flows.transitions[transition] || data.flows.transitions[transition].length == 0) {
+            valid.result = false;
+            valid.issues = valid.issues.concat([`${transition} has no output places`]);
+        }
+        if (!placesValues.includes(transition)) {
+            valid.result = false;
+            valid.issues = valid.issues.concat([`${transition} has no input places`]);
+        }
+    });
+
+    data.transitions.high.forEach(transition => {
+        if (!data.flows.transitions[transition] || data.flows.transitions[transition].length == 0) {
+            valid.result = false;
+            valid.issues = valid.issues.concat([`${transition} has no output places`]);
+        }
+        if (!placesValues.includes(transition)) {
+            valid.result = false;
+            valid.issues = valid.issues.concat([`${transition} has no input places`]);
+        }
+    });
+
+    console.log(valid.issues)
+    return valid;
 }
 
 function addToSelect(data) {

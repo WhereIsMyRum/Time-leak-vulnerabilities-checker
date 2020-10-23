@@ -36,7 +36,11 @@ time_leak::NetPruner::pruningCase time_leak::NetPruner::getPruningCase(Transitio
     {
         if (transition->GetOutElements().size() == 1)
         {
-            pCase = pruningCase::oneToOne;
+            Place *outputPlace = transition->GetOutElements().begin()->second;
+            if (outputPlace->GetInElements().size() > 1) 
+                pCase = pruningCase::notPrunable;
+            else
+                pCase = pruningCase::oneToOne;
         }
         else
         {
@@ -110,25 +114,18 @@ bool time_leak::NetPruner::checkIfAllLow(Transition *transition)
 
 bool time_leak::NetPruner::checkIfSingle(Transition *transition)
 {
+    Place *place;
     if (transition->GetOutElements().size() == 1)
-    {
-        Place *place = transition->GetOutElements().begin()->second;
-        if (place->GetOutElements().size() > 1)
-        {
-            return false;
-        }
-    }
+        place = transition->GetOutElements().begin()->second;
     else
+        place = transition->GetInElements().begin()->second;
+
+    if (place->GetOutElements().size() > 1 || place->GetInElements().size() > 1)
     {
-        Place *place = transition->GetInElements().begin()->second;
-        if (place->GetInElements().size() > 1)
-        {
-            return false;
-        }
+        return false;
     }
 
     return true;
-
 }
 
 void time_leak::NetPruner::pruneOneToOne(Transition *transition, Net *net)
