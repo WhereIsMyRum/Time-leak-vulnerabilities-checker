@@ -24,12 +24,16 @@ namespace time_leak
         std::map<std::string, T *> inElements;
         std::map<std::string, T *> outElements;
         bool analyzed;
+        bool conditionallyLowEnd = false;
+        bool conditionallyLowStart = false;
 
     public:
         Element<T>(std::string id);
 
         const std::string GetId();
         const bool WasAnalyzed();
+        const bool IsConditionallyLowStart();
+        const bool IsConditionallyLowEnd();
         std::map<std::string, T *> GetInElements();
         std::map<std::string, T *> GetOutElements();
         void RemoveInElement(std::string elementId);

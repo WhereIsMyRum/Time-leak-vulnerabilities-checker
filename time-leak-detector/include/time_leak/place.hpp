@@ -30,8 +30,6 @@ namespace time_leak
         void countHighInAndHighOut();
 
     public:
-        bool parallelIn = false;
-        bool parallelOut = false;
         Place(std::string id);
         bool GetEndTimeDeducible();
         bool GetStartTimeDeducible();

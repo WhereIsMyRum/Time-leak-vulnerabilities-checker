@@ -62,17 +62,29 @@ bool time_leak::Transition::canDeduceEndTime()
     if (!this->IsHigh())
         return true;
 
-    this->isParallel = false;
-
     map<string, Place *>::iterator iterator;
     bool canBeDeduced = false;
+    int numberOfConditionallyLowEnd = 0;
+    int numberOfTimeDeducible = 0;
 
     for (iterator = this->outElements.begin(); iterator != this->outElements.end(); ++iterator)
     {
         if (iterator->second->GetEndTimeDeducible())
         {
+            ++numberOfTimeDeducible;
             canBeDeduced = true;
         }
+        if (iterator->second->IsConditionallyLowEnd())
+        {
+            ++numberOfConditionallyLowEnd;
+            this->conditionallyLowEndId = iterator->second->GetId();
+
+        }
+    }
+
+    if (numberOfConditionallyLowEnd == 1 && numberOfConditionallyLowEnd == numberOfTimeDeducible)
+    {
+        this->conditionallyLowEnd = true;
     }
 
     return canBeDeduced;
@@ -83,10 +95,9 @@ bool time_leak::Transition::canDeduceStartTime()
     if (!this->IsHigh())
         return true;
 
-    this->isParallel = false;
-
     map<string, Place *>::iterator iterator;
     bool canBeDeduced = true;
+    int numberOfConditionallyLowStart = 0;
 
     for (iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
@@ -94,21 +105,29 @@ bool time_leak::Transition::canDeduceStartTime()
         {
             canBeDeduced = false;
         }
+        if (iterator->second->IsConditionallyLowStart())
+        {
+            ++numberOfConditionallyLowStart;
+            this->conditionallyLowStartId = iterator->second->GetId();
+        }
     }
+
+    if (numberOfConditionallyLowStart == 1)
+    {
+        this->conditionallyLowStart = true;
+    }
+
     return canBeDeduced;
 }
 
 bool time_leak::Transition::Analyze()
 {
-    //cout << "Analyzing " << this->id << endl;
     TransitionType initialVal = this->transitionType;
 
     if (this->canDeduceEndTime())
         this->transitionType = TransitionType::lowEnd;
     if (this->canDeduceStartTime())
         this->transitionType = this->transitionType == TransitionType::lowEnd ? TransitionType::low : TransitionType::lowStart;
-    if (this->isParallel && this->transitionType == TransitionType::high)
-        this->transitionType = TransitionType::parallel;
 
     this->SetAnalyzed(true);
 

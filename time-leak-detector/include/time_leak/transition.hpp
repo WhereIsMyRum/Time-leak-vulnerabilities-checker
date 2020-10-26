@@ -24,7 +24,6 @@ namespace time_leak
 
     private:
         bool highT;
-        bool isParallel = false;
         bool canDeduceEndTime();
         bool canDeduceStartTime();
         void analyzeIngoing();
@@ -38,6 +37,8 @@ namespace time_leak
         bool Analyze();
         std::string GetTransitionTypeString();
         void SetTransitionType(TransitionType t);
+        std::string conditionallyLowStartId;
+        std::string conditionallyLowEndId;
     };
 } // namespace time_leak
 

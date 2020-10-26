@@ -73,6 +73,18 @@ void time_leak::Element<T>::SetAnalyzed(bool analyzed)
 }
 
 template <class T>
+const bool time_leak::Element<T>::IsConditionallyLowEnd()
+{
+    return this->conditionallyLowEnd;
+}
+
+template <class T>
+const bool time_leak::Element<T>::IsConditionallyLowStart()
+{
+    return this->conditionallyLowStart;
+}
+
+template <class T>
 void time_leak::Element<T>::Print()
 {
     typename map<std::string, T *>::iterator iterator;

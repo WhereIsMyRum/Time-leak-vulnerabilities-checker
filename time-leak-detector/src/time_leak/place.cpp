@@ -25,6 +25,13 @@ bool time_leak::Place::isEndTimeDeducible()
     if (this->highOut == 0)
         return true;
 
+    if (this->highOut != this->outElements.size())
+    {
+        this->conditionallyLowEnd = true;
+        return true;
+    }
+    
+
     return false;
 }
 
@@ -35,11 +42,15 @@ bool time_leak::Place::isStartTimeDeducible()
 
     if (this->highIn == 0)
     {
-        if (this->highOut == 0)
-            return true;
-
         if (this->highOut < 2)
             return true;
+        return false;
+    }
+
+    if (this->highIn != this->inElements.size())
+    {
+        this->conditionallyLowStart = true;
+        return true;
     }
 
     return false;
@@ -59,7 +70,7 @@ void time_leak::Place::countHighInAndHighOut()
 
     for (auto iterator = this->outElements.begin(); iterator != this->outElements.end(); ++iterator)
     {
-        if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != Transition::TransitionType::lowStart)
+        if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != Transition::TransitionType::lowStart || ((iterator->second->GetTransitionType() == Transition::TransitionType::lowStart || iterator->second->GetTransitionType() == Transition::TransitionType::low) && iterator->second->IsConditionallyLowStart() && this->GetId() == iterator->second->conditionallyLowStartId))
         {
             ++highOut;
         }
@@ -67,7 +78,7 @@ void time_leak::Place::countHighInAndHighOut()
 
     for (auto iterator = this->inElements.begin(); iterator != this->inElements.end(); ++iterator)
     {
-        if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != Transition::TransitionType::lowEnd)
+        if (!iterator->second->CheckIfLow() && iterator->second->GetTransitionType() != Transition::TransitionType::lowEnd || ((iterator->second->GetTransitionType() == Transition::TransitionType::lowEnd || iterator->second->GetTransitionType() == Transition::TransitionType::low) && iterator->second->IsConditionallyLowEnd() && this->GetId() == iterator->second->conditionallyLowEndId))
         {
             highIn++;
         }
@@ -76,9 +87,11 @@ void time_leak::Place::countHighInAndHighOut()
 
 bool time_leak::Place::Analyze()
 {
-    //cout << "Analyzing " << this->id << endl;
     bool initialValEnd = this->endTimeDeducible;
     bool initalValStart = this->startTimeDeducible;
+
+    this->conditionallyLowStart = false;
+    this->conditionallyLowEnd = false;
 
     countHighInAndHighOut();
     canTimeBeDeduced();

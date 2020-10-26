@@ -4,6 +4,8 @@ using namespace std;
 
 void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net)
 {
+    Place *startPlace = this->findStartPlace(net.GetPlaces());
+
     while(this->wasChanged())
     {
         this->resetChanged();
@@ -15,7 +17,7 @@ void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net)
         this->resetAnalyzedFlag(net.GetPlaces());
         this->resetAnalyzedFlag(net.GetHighTransitions());
         this->resetAnalyzedFlag(net.GetLowTransitions());
-        this->analyzeNet(net, this->findStartPlace(net.GetPlaces()), false);
+        this->analyzeNet(net, startPlace, false);
     }
     this->checkForSpecialCases(net.GetHighTransitions());
 
@@ -79,7 +81,7 @@ void time_leak::NetAnalyzer::checkIntervalOnlyCase(time_leak::Transition *transi
         map<string, time_leak::Transition *> transitions = it1->second->GetOutElements();
         for (auto it2 = transitions.begin(); it2 != transitions.end(); ++it2)
         {
-            if (it2->second->CheckIfLow())
+            if (it2->second->CheckIfLow() && !it2->second->IsConditionallyLowStart())
             {
                 if (it2->second->GetInElements().size() > 1)
                 {
