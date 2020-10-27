@@ -37,8 +37,8 @@ app.post("/analyze", (request, response) => {
             }
 
         });
-        setTimeout(() => response.send(resultString), 10000)
-    });
+        response.send(resultString);
+    }); 
 });
 
 app.get("/nets", (request, response) => {
