@@ -55,6 +55,10 @@ canvas {
     margin-right: 10px;
 }
 
+.lengend {
+    margin-left: 25px;
+}
+
 #color-codes {
     margin-left: 25px;
 }
@@ -81,6 +85,16 @@ canvas {
 
 .label {
     margin-bottom: 2px;
+}
+
+.full {
+    background-color: black;
+}
+
+.border {
+    border: 3px solid black;
+    width: 9px;
+    height: 9px;
 }
 
 .low {
