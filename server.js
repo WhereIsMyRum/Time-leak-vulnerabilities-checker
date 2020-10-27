@@ -6,39 +6,44 @@ const fs = require('fs');
 const PORT = 5000;
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
-app.use(redirectToHTTPS([/localhost:(\d{4})/],[],301));
+app.use(redirectToHTTPS([/localhost:(\d{4})/], [], 301));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded());
 app.use(express.static(__dirname + '/visualisation'));
 
 app.post("/analyze", (request, response) => {
-    let results = childProcess.execFileSync(`${__dirname}/time-leak-detector/main.exe`, [JSON.stringify(request.body.custom)]).toString().split('\n');
-    console.log(results);
-    results = results.map(result => result.replace('\r', ''));
-    const resultString = JSON.parse(JSON.stringify(request.body.custom));
-    delete resultString['results'];
-    resultString.colors = {};
-    resultString.conditional = [];
-    results.forEach(result => {
-        if (result.includes('-')) {
-            const res = result.split('-');
-            console.log(res);
-            if (res && res[0].startsWith('H')) {
-                resultString.colors[res[0]] = getColorFromTransitionType(res[1]);
-                if (res[2] && res[2] == "conditional") {
-                    resultString.conditional.push(res[0]);
+    childProcess.execFile(`${__dirname}/time-leak-detector/main`, [JSON.stringify(request.body.custom)], {timeout: 10000}, (error, stdout) => {
+        if (error) {
+            response.sendStatus(500);
+        }
+
+        let results = stdout.toString().split('\n');
+        results = results.map(result => result.replace('\r', ''));
+        const resultString = JSON.parse(JSON.stringify(request.body.custom));
+        delete resultString['results'];
+        resultString.colors = {};
+        resultString.conditional = [];
+        results.forEach(result => {
+            if (result.includes('-')) {
+                const res = result.split('-');
+                console.log(res);
+                if (res && res[0].startsWith('H')) {
+                    resultString.colors[res[0]] = getColorFromTransitionType(res[1]);
+                    if (res[2] && res[2] == "conditional") {
+                        resultString.conditional.push(res[0]);
+                    }
                 }
             }
-        }
-        
+
+        });
+        setTimeout(() => response.send(resultString), 10000)
     });
-    response.send(resultString);
 });
 
 app.get("/nets", (request, response) => {
     let nets = fs.readdirSync(`${__dirname}/time-leak-detector/nets`);
-    
+
     nets = nets.map((net) => {
         const n = net.split('.');
         return {
@@ -48,7 +53,7 @@ app.get("/nets", (request, response) => {
     });
 
     nets = nets.sort((n1, n2) => {
-        if(n1.order > n2.order) {
+        if (n1.order > n2.order) {
             return 1;
         }
         return -1;
@@ -77,8 +82,7 @@ app.listen(PORT, () => {
 });
 
 const getColorFromTransitionType = (transitionType) => {
-    if (transitionType.includes('-'))
-    {
+    if (transitionType.includes('-')) {
         return transitionType.split('-').map(color => colorTransitionMap[color]);
     }
 
