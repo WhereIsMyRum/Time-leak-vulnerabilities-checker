@@ -21,12 +21,17 @@ app.post("/analyze", (request, response) => {
     const resultString = JSON.parse(JSON.stringify(request.body.custom));
     delete resultString['results'];
     resultString.colors = {};
+    resultString.conditional = [];
     results.forEach(result => {
         if (result.includes('-')) {
             const res = result.split('-');
+            console.log(res);
             if (res && res[0].startsWith('H')) {
                 resultString.colors[res[0]] = getColorFromTransitionType(res[1]);
-            };
+                if (res[2] && res[2] == "conditional") {
+                    resultString.conditional.push(res[0]);
+                }
+            }
         }
         
     });

@@ -1,0 +1,57 @@
+function Main(input)
+    net = new Net(input)
+    net.WasUpdated = true
+
+    while net.WasUpdated do
+        net.WasUpdated = false
+
+        net.AnalyzeNet("up")
+        net.AnalyzeNet("down")
+    end
+
+
+
+function AnalyzeNet(direction)
+    transitionsQueue := emptyUniqueFifoQueue
+    placesQueue := emptyUniqueFifoQueue
+
+    startPlace := getStartPlaceBasedOnDirection(direction)
+    startPlace.Analyze()
+    startPlace.Traverse(direction, transitionsQueue)
+
+    while (transitionsQueue != emptyQueue && placesQueue != emptyQueue) do
+        ForwardQueue(transitionsQueue, placesQueue, direction)
+        ForwardQueue(placesQueue, transitionsQueue, direction)
+        if net state has changed
+            net.WasUpdated = true
+    end
+
+function Traverse(direction, queue)
+    if direction == "up"
+        append all ingoing elements to the queue
+    else if direction == "down"
+        append all outgoing elements to the queue
+    return
+
+
+function ForwardQueue(mainQueue, secondQueue, direction)
+    if direction == "up"
+        elementsSet = "outgoing"
+    else if direction == "down"
+        elementsSet = "ingoing"
+
+    if mainQueue.Front() has all elements in elementsSet analyzed
+        element = mainQueue.PopFront()
+        element.Analyze()
+        element.Traverse(direction, secondQueue)
+    else
+        element = mainQueue.Front()
+        analyze a single element from the elementsSet of the element that was not analyzed yet
+        move mainQueue front to the back of the queue
+
+
+function getStartPlaceBasedOnDirection(direction)
+    if direction == "up"
+        return endPlace
+    if direction == "down"
+        return startPlace

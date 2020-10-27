@@ -36,6 +36,8 @@ namespace time_leak
         bool GetEndTimeDeducible();
         bool GetStartTimeDeducible();
         bool Analyze();
+        int GetHighIn();
+        int GetHighOut();
     };
 
 } // namespace time_leak

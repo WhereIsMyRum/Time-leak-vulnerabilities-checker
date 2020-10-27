@@ -19,6 +19,16 @@ void time_leak::Transition::SetTransitionType(time_leak::Transition::TransitionT
     this->transitionType = t;
 }
 
+void time_leak::Transition::SetConditional()
+{
+    this->conditional = true;
+}
+
+bool time_leak::Transition::GetConditional()
+{
+    return this->conditional;
+}
+
 string time_leak::Transition::GetTransitionTypeString()
 {
     string transitionString;
@@ -39,10 +49,10 @@ string time_leak::Transition::GetTransitionTypeString()
         case TransitionType::maxDuration:
             transitionString = "maxDuration";
             break;
-        case TransitionType::parallel:
-            transitionString = "parallel";
-            break;
     }
+
+    if (this->conditional)
+        transitionString.append("-conditional");
 
     return transitionString;
 }
@@ -62,8 +72,6 @@ bool time_leak::Transition::canDeduceEndTime()
     if (!this->IsHigh())
         return true;
 
-    this->isParallel = false;
-
     map<string, Place *>::iterator iterator;
     bool canBeDeduced = false;
 
@@ -82,8 +90,6 @@ bool time_leak::Transition::canDeduceStartTime()
 {
     if (!this->IsHigh())
         return true;
-
-    this->isParallel = false;
 
     map<string, Place *>::iterator iterator;
     bool canBeDeduced = true;
@@ -107,8 +113,6 @@ bool time_leak::Transition::Analyze()
         this->transitionType = TransitionType::lowEnd;
     if (this->canDeduceStartTime())
         this->transitionType = this->transitionType == TransitionType::lowEnd ? TransitionType::low : TransitionType::lowStart;
-    if (this->isParallel && this->transitionType == TransitionType::high)
-        this->transitionType = TransitionType::parallel;
 
     this->SetAnalyzed(true);
 

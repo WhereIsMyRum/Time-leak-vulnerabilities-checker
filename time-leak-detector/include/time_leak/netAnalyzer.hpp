@@ -11,6 +11,9 @@ namespace time_leak
         void analyzeNet(Net &net, Place *startPlace, bool upwards);
         void checkForSpecialCases(map<std::string, Transition*> &highTransitons); 
         void checkIntervalOnlyCase(Transition *transition);
+        void checkConditionalCase(Transition *transition);
+        void checkConditionallyLowStart(Transition *transition);
+        void checkConditionallyLowEnd(Transition *transition);
 
         template <class T>
         void resetAnalyzedFlag(T &Elements);

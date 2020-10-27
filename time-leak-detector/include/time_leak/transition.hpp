@@ -19,12 +19,12 @@ namespace time_leak
     public:
         enum TransitionType 
         {
-            high, low, lowStart, lowEnd, maxDuration, parallel
+            high, low, lowStart, lowEnd, maxDuration
         };
 
     private:
         bool highT;
-        bool isParallel = false;
+        bool conditional = false;
         bool canDeduceEndTime();
         bool canDeduceStartTime();
         void analyzeIngoing();
@@ -38,6 +38,9 @@ namespace time_leak
         bool Analyze();
         std::string GetTransitionTypeString();
         void SetTransitionType(TransitionType t);
+        void SetConditional();
+        bool GetConditional();
+
     };
 } // namespace time_leak
 

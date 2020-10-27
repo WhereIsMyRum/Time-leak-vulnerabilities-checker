@@ -76,7 +76,6 @@ function analyze() {
             .then(res => res.json())
             .then(data => reRender(data));
     } else {
-        console.log(valid);
         alert(`The net you\'re trying to submit is incorrect:\n ${valid.issues.map(issue => issue).join('\n')}`);
     }
 }
@@ -159,7 +158,6 @@ function validateData(data) {
         }
     });
 
-    console.log(valid.issues)
     return valid;
 }
 

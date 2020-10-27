@@ -103,7 +103,8 @@ class Shape {
         } else {
             push();
             stroke(this.color);
-            if (this.color != 'black') strokeWeight(4);
+            if (this.color != 'black' && !this.conditional) fill(this.color);
+            if (this.conditional) strokeWeight(4);
             callback(...args);
             pop();
         }
@@ -135,8 +136,9 @@ class Place extends Shape {
 };
 
 class Transitions extends Shape {
-    constructor(id, places, color = 'black', tokens = 0, dimension = SIDE) {
+    constructor(id, places, conditional, color = 'black', tokens = 0, dimension = SIDE) {
         super(id, dimension, color, tokens);
+        this.conditional = conditional
         places ? this.places = places : this.places = [];
     };
 
@@ -247,9 +249,10 @@ function createPlaces(net) {
 function createTransitions(net) {
     const transitions = {};
     let places = [...net.places];
-    const allTransitions = [...net.transitions.low, ...net.transitions.high]
+    const allTransitions = [...net.transitions.low, ...net.transitions.high];
     allTransitions.forEach(transitionId => {
-        const transition = (net.colors && net.colors[transitionId]) ? new Transitions(transitionId, net.flows.transitions[transitionId], net.colors[transitionId]) : new Transitions(transitionId, net.flows.transitions[transitionId]);
+        const conditional = net.conditional && net.conditional.find(element => element == transitionId) ? true : false;
+        const transition = (net.colors && net.colors[transitionId]) ? new Transitions(transitionId, net.flows.transitions[transitionId], conditional, net.colors[transitionId]) : new Transitions(transitionId, net.flows.transitions[transitionId], conditional);
         transitions[transitionId] = transition;
 
         places = filterPlaces(net, transitionId, places);

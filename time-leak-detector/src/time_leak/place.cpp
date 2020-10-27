@@ -17,12 +17,22 @@ bool time_leak::Place::GetStartTimeDeducible()
     return this->startTimeDeducible;
 }
 
+int time_leak::Place::GetHighIn()
+{
+    return this->highIn;
+}
+
+int time_leak::Place::GetHighOut()
+{
+    return this->highOut;
+}
+
 bool time_leak::Place::isEndTimeDeducible()
 {
     if (this->inElements.size() == 0 || this->outElements.size() == 0)
         return false;
 
-    if (this->highOut == 0)
+    if (this->highOut == 0 && this->highIn < 2)
         return true;
 
     return false;
