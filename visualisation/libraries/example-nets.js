@@ -1481,6 +1481,89 @@ const nets = {
             "H3-high",
             "H4-high"
         ]
+    },
+    "30\.Conditional-complex": {
+        "places": [
+            "p1",
+            "p2",
+            "p3",
+            "p4",
+            "p5",
+            "p6",
+            "p7"
+        ],
+        "transitions": {
+            "high": [
+                "H1",
+                "H2",
+                "H3",
+                "H4",
+                "H5"
+            ],
+            "low": [
+                "L1",
+                "L2",
+                "L3"
+            ]
+        },
+        "flows": {
+            "places": {
+                "p1": [
+                    "L1"
+                ],
+                "p2": [
+                    "H1"
+                ],
+                "p3": [
+                    "H2"
+                ],
+                "p5": [
+                    "L2",
+                    "H4"
+                ],
+                "p6": [
+                    "H3"
+                ],
+                "p7": [
+                    "L3",
+                    "H5"
+                ]
+            },
+            "transitions": {
+                "L1": [
+                    "p2"
+                ],
+                "L2": [
+                    "p4"
+                ],
+                "H1": [
+                    "p3",
+                    "p5","p6"
+                ],
+                "H2": [
+                    "p4"
+                ],
+                "H3": [
+                    "p7"
+                ],
+                "H4": [
+                    "p4"
+                ],
+                "H5": [
+                    "p4"
+                ],
+                "L3": [
+                    "p4"
+                ]
+            }
+        },
+        "results": [
+            "H1-low-conditional",
+            "H2-lowStart-conditional",
+            "H3-low-conditional",
+            "H4-high",
+            "H5-high"
+        ]
     }
 }
 

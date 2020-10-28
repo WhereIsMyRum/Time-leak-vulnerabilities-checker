@@ -55,6 +55,18 @@ canvas {
     margin-right: 10px;
 }
 
+.input-holder .conditional-checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-holder .conditional-checkbox p {
+    margin-right: 5px;
+}
+
 .lengend {
     margin-left: 25px;
 }
