@@ -4,7 +4,7 @@ using namespace std;
 
 void time_leak::NetParser::CheckArguments(int argc)
 {
-    if (argc == 0)
+    if (argc == 1)
     {
         cout << "No arguments passed, exiting." << endl;
         exit(1);
