@@ -9,7 +9,7 @@ namespace time_leak
     {
         bool changed = true;
         void analyzeNet(Net &net, Place *startPlace, bool upwards);
-        void checkForSpecialCases(map<std::string, Transition*> &highTransitons); 
+        void checkForSpecialCases(map<std::string, Transition*> &highTransitons, bool runConditional); 
         void checkIntervalOnlyCase(Transition *transition);
         void checkConditionalCase(Transition *transition);
         void checkConditionallyLowStart(Transition *transition);
@@ -25,7 +25,7 @@ namespace time_leak
         void printResults(map<std::string, Transition*> &highTransitions);
 
         public:
-            void RunAnalysis(Net &net);
+            void RunAnalysis(Net &net, bool runConditional);
     };
 }
 

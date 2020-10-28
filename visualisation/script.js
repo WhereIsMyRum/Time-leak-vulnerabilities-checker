@@ -62,7 +62,8 @@ function populateSavedNets() {
 
 function analyze() {
     const data = {
-        "custom": JSON.parse(netHolder.value)
+        "custom": JSON.parse(netHolder.value),
+        "conditional": document.getElementById('conditional').checked
     }
     const valid = validateData(data.custom);
     if (valid.result) {

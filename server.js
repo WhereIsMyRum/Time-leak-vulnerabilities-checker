@@ -15,7 +15,8 @@ app.use(express.static(__dirname + '/visualisation'));
 childProcess.execSync('chmod a+x /app/time-leak-detector/main');
 
 app.post("/analyze", (request, response) => {
-    childProcess.execFile(`${__dirname}/time-leak-detector/main`, [JSON.stringify(request.body.custom)], {timeout: 10000}, (error, stdout) => {
+    const conditional = request.body.conditional ? 1 : 0;
+    childProcess.execFile(`${__dirname}/time-leak-detector/main`, [JSON.stringify(request.body.custom), conditional], {timeout: 10000}, (error, stdout) => {
         if (error) {
             response.sendStatus(500);
         }
@@ -40,7 +41,7 @@ app.post("/analyze", (request, response) => {
 
         });
         response.send(resultString);
-    });
+    }); 
 });
 
 app.get("/nets", (request, response) => {

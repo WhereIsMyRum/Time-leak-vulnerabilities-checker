@@ -2,7 +2,7 @@
 
 using namespace std;
 
-void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net)
+void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net, bool runConditional)
 {
     while(this->wasChanged())
     {
@@ -17,7 +17,7 @@ void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net)
         this->resetAnalyzedFlag(net.GetLowTransitions());
         this->analyzeNet(net, this->findStartPlace(net.GetPlaces()), false);
     }
-    this->checkForSpecialCases(net.GetHighTransitions());
+    this->checkForSpecialCases(net.GetHighTransitions(), runConditional);
 
     printResults(net.GetHighTransitions());
 }
@@ -60,12 +60,13 @@ time_leak::Place *time_leak::NetAnalyzer::findStartPlace(map<string, time_leak::
     return p;
 }
 
-void time_leak::NetAnalyzer::checkForSpecialCases(map<string, time_leak::Transition*> &highTransitions)
+void time_leak::NetAnalyzer::checkForSpecialCases(map<string, time_leak::Transition*> &highTransitions, bool runConditional)
 {
     for (auto iterator = highTransitions.begin(); iterator != highTransitions.end(); ++iterator)
     {
         this->checkIntervalOnlyCase(iterator->second);
-        this->checkConditionalCase(iterator->second);
+        if (runConditional)
+            this->checkConditionalCase(iterator->second);
     }
 
 }
