@@ -1,0 +1,12 @@
+function Main(input)
+    net = new Net(input)
+    net.WasUpdated = true
+
+    while net.WasUpdated do
+        net.WasUpdated = false
+
+        net.AnalyzeNet("up")
+        net.AnalyzeNet("down")
+    end
+
+

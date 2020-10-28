@@ -1,0 +1,14 @@
+function ForwardQueue(mainQueue, secondQueue, direction)
+    if direction == "up"
+        elementsSet = "outgoing"
+    else if direction == "down"
+        elementsSet = "ingoing"
+
+    if mainQueue.Front() has all elements in elementsSet analyzed
+        element = mainQueue.PopFront()
+        element.Analyze()
+        element.Traverse(direction, secondQueue)
+    else
+        element = mainQueue.Front()
+        analyze first yet Not analyzed element from elementsSet
+        move mainQueue front element to the back of the queue

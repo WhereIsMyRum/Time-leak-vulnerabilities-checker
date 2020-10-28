@@ -1,0 +1,13 @@
+function countTransitions()
+    highInputTransitions = 0
+    highOutputTransitions = 0
+
+    for transition in inputTransitions do
+        if transition is not low and transition is not low-start
+            highInputTransitions += 1
+    end
+
+    for transition in outputTransitions do
+        if transition is not low and transition is not low-end
+            highOutputTransitions += 1
+    end

@@ -1,0 +1,14 @@
+function AnalyzeNet(direction)
+    transitionsQueue = emptyUniqueFifoQueue
+    placesQueue = emptyUniqueFifoQueue
+
+    startPlace = getStartPlaceBasedOnDirection(direction)
+    startPlace.Analyze()
+    startPlace.Traverse(direction, transitionsQueue)
+
+    while (transitionsQueue != emptyQueue and placesQueue != emptyQueue) do
+        ForwardQueue(transitionsQueue, placesQueue, direction)
+        ForwardQueue(placesQueue, transitionsQueue, direction)
+        if net state has changed
+            net.WasUpdated = true
+    end

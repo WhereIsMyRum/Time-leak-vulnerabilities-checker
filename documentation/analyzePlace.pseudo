@@ -1,0 +1,5 @@
+//analyze place
+function Analyze()
+    countTransitions()
+    isEndTimeDeducible()
+    isStartTimeDeducible()

@@ -43,14 +43,8 @@ bool time_leak::Place::isStartTimeDeducible()
     if (this->inElements.size() == 0 || this->outElements.size() == 0)
         return false;
 
-    if (this->highIn == 0)
-    {
-        if (this->highOut == 0)
-            return true;
-
-        if (this->highOut < 2)
-            return true;
-    }
+    if (this->highIn == 0 && this->highOut < 2)
+        return true;
 
     return false;
 }

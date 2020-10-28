@@ -1,0 +1,10 @@
+//analyze transition
+function Analyze()
+    transitionType = "high"
+    if (canDeduceEndTime())
+        transitionType = "lowEnd"
+    if (canDeduceStartTime())
+        if (transitionType == "lowEnd")
+            transitionType = "low"
+        else
+            transitionType = "lowStart"

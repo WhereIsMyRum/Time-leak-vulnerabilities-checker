@@ -7,7 +7,7 @@ describe('Main', () => {
     Object.entries(nets).forEach(([key,value]) => {
         if (value.results.length != 0) {
             it(`${key} should return correct answer`, () => {
-                let result = childProcess.execFileSync('./time-leak-detector/main.exe', [JSON.stringify(value)]).toString().split('\n');
+                let result = childProcess.execFileSync('./time-leak-detector/main.exe', [JSON.stringify(value), '1']).toString().split('\n');
                 result = result.map(result => result.replace('\r', ''));
                 result.pop();
                 assert.ok(_.isEqual(result, value.results));
