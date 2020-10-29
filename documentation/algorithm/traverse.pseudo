@@ -1,0 +1,6 @@
+function Traverse(direction, queue)
+    if direction == "up"
+        append all ingoing elements to the queue
+    else if direction == "down"
+        append all outgoing elements to the queue
+    return

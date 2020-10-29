@@ -1,0 +1,10 @@
+function canDeduceEndTime()
+
+    canDeduce = false
+    for place in outputPlaces do
+        if (place is endTimeDeducible)
+            canDeduce = true
+            break
+    end
+
+    return canDeduce

@@ -1,0 +1,10 @@
+function canDeduceStartTime()
+    canDeduce = true
+
+    for place in outputPlaces do
+        if (place is not startTimeDeducible)
+            canDeduce = false
+            break
+    end
+
+    return canDeduce

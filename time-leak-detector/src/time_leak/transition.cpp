@@ -80,6 +80,7 @@ bool time_leak::Transition::canDeduceEndTime()
         if (iterator->second->GetEndTimeDeducible())
         {
             canBeDeduced = true;
+            break;
         }
     }
 
@@ -99,6 +100,7 @@ bool time_leak::Transition::canDeduceStartTime()
         if (!iterator->second->GetStartTimeDeducible())
         {
             canBeDeduced = false;
+            break;
         }
     }
     return canBeDeduced;

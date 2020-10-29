@@ -1,0 +1,21 @@
+function getPruningCase(transition)
+    numberOfInElements = transition.InElementsSize
+    numberOfOutElements = transition.OutElementsSize
+    pruningCase = "not prunable"
+
+    if (numberOfInElements == 1)
+        if (numberOfOutElements == 1)
+            pruningCase = "one to one"
+        else 
+            pruningCase = "one to many single"
+    else if (numberOfOutElements == 1)
+        pruningCase = "many to one single"
+
+    if (not checkIfAllLow(transition))
+        pruningCase = "not prunable"
+
+    if (pruningCase == "many to one single" or pruningCase == "one to many single")
+        if (not checkIfSingle(transition))
+            pruningCase = "not prunable"
+
+    return pruningCase

@@ -1,0 +1,12 @@
+function PruneNet()
+    for transition in lowTransitions do
+        pruningCase = getPruningCase(transition)
+        if (pruningCase == "one to one")
+            pruneOneToOne(transition)
+        else if (pruningCase == "one to many single")
+            pruneOneToManySingle(transition)
+        else if (pruningCase == "many to one single")
+            pruneManyToOneSingle(transition)
+        else
+            continue;
+    end
