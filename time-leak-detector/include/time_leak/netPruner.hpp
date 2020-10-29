@@ -11,14 +11,16 @@ namespace time_leak
     {
         enum pruningCase
         {
-            oneToOne,
+            oneToOneFront,
+            oneToOneBack,
             oneToManySingle,
             manyToOneSingle,
             notPrunable
         };
 
         pruningCase getPruningCase(Transition *transition);
-        void pruneOneToOne(Transition *transition, Net *net);
+        void pruneOneToOneFront(Transition *transition, Net *net);
+        void pruneOneToOneBack(Transition *transition, Net *net);
         void pruneOneToManySingle(Transition *transition, Net *net);
         void pruneManyToOneSingle(Transition *transition, Net *net);
         bool checkIfAllLow(Transition *transition);

@@ -10,9 +10,13 @@ void time_leak::NetPruner::PruneNet(time_leak::Net *net)
     {
         switch (this->getPruningCase(iterator->second))
         {
-            case pruningCase::oneToOne:
-                cout << iterator->second->GetId() << " oneToOne" << endl;
-                pruneOneToOne(iterator->second, net);
+            case pruningCase::oneToOneFront:
+                cout << iterator->second->GetId() << " oneToOneFront" << endl;
+                pruneOneToOneFront(iterator->second, net);
+            break;
+            case pruningCase::oneToOneBack:
+                pruneOneToOneBack(iterator->second, net);
+                cout << iterator->second->GetId() << " oneToOneBack" << endl;
             break;
             case pruningCase::oneToManySingle:
                 cout << iterator->second->GetId() << " oneToManySingle" << endl;
@@ -37,10 +41,14 @@ time_leak::NetPruner::pruningCase time_leak::NetPruner::getPruningCase(Transitio
         if (transition->GetOutElements().size() == 1)
         {
             Place *outputPlace = transition->GetOutElements().begin()->second;
-            if (outputPlace->GetInElements().size() > 1) 
-                pCase = pruningCase::notPrunable;
+            Place *inputPlace = transition->GetInElements().begin()->second;
+
+            if (outputPlace->GetInElements().size() == 1)
+                pCase = pruningCase::oneToOneFront;
+            else if (inputPlace->GetOutElements().size() == 1)
+                pCase = pruningCase::oneToOneBack;
             else
-                pCase = pruningCase::oneToOne;
+                pCase = pruningCase::notPrunable;
         }
         else
         {
@@ -128,7 +136,7 @@ bool time_leak::NetPruner::checkIfSingle(Transition *transition)
     return true;
 }
 
-void time_leak::NetPruner::pruneOneToOne(Transition *transition, Net *net)
+void time_leak::NetPruner::pruneOneToOneFront(Transition *transition, Net *net)
 {
     Place *startPlace = transition->GetInElements().begin()->second;
     Place *removePlace = transition->GetOutElements().begin()->second;
@@ -141,6 +149,25 @@ void time_leak::NetPruner::pruneOneToOne(Transition *transition, Net *net)
         iterator->second->RemoveInElement(removePlace->GetId());
         iterator->second->AddInElement(startPlace);
         startPlace->AddOutElement(iterator->second);
+    }
+
+    net->RemovePlace(removePlace->GetId());
+    net->RemoveTransition(transition->GetId());
+}
+
+void time_leak::NetPruner::pruneOneToOneBack(Transition *transition, Net *net)
+{
+    Place *endPlace = transition->GetOutElements().begin()->second;
+    Place *removePlace = transition->GetInElements().begin()->second;
+
+    endPlace->RemoveInElement(transition->GetId());
+
+    map<string, Transition *> removePlaceInTransitions = removePlace->GetInElements();
+    for (auto iterator = removePlaceInTransitions.begin(); iterator != removePlaceInTransitions.end(); ++iterator)
+    {
+        iterator->second->RemoveOutElement(removePlace->GetId());
+        iterator->second->AddInElement(endPlace);
+        endPlace->AddInElement(iterator->second);
     }
 
     net->RemovePlace(removePlace->GetId());

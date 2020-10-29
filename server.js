@@ -20,6 +20,7 @@ app.post("/analyze", (request, response) => {
         }
 
         let results = stdout.toString().split('\n');
+        console.log(results);
         results = results.map(result => result.replace('\r', ''));
         const resultString = JSON.parse(JSON.stringify(request.body.custom));
         delete resultString['results'];
