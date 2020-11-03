@@ -12,6 +12,9 @@ void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net, bool runConditiona
         net.GetTransitionsQueue().Clear();
         net.GetPlacesQueue().Clear();
 
+        if (!this->wasChanged())
+            break;
+
         this->resetAnalyzedFlag(net.GetPlaces());
         this->resetAnalyzedFlag(net.GetHighTransitions());
         this->resetAnalyzedFlag(net.GetLowTransitions());
@@ -179,6 +182,9 @@ void time_leak::NetAnalyzer::checkConditionallyLowEnd(time_leak::Transition *tra
 
     for (auto outputPlace = outputPlaces.begin(); outputPlace != outputPlaces.end(); ++outputPlace)
     {
+        if (outputPlace->second->GetHighIn() > 1) {
+            continue;
+        }
         map<string, Transition*> outputTransitions = outputPlace->second->GetOutElements();
         for (auto outputTransition = outputTransitions.begin(); outputTransition != outputTransitions.end(); ++outputTransition)
         {
