@@ -32,7 +32,7 @@ bool time_leak::Place::isEndTimeDeducible()
     if (this->inElements.size() == 0 || this->outElements.size() == 0)
         return false;
 
-    if (this->highOut == 0 && this->highIn < 2)
+    if (this->highOut == 0)
         return true;
 
     return false;
@@ -43,7 +43,7 @@ bool time_leak::Place::isStartTimeDeducible()
     if (this->inElements.size() == 0 || this->outElements.size() == 0)
         return false;
 
-    if (this->highIn == 0 && this->highOut < 2)
+    if (this->highIn == 0)
         return true;
 
     return false;

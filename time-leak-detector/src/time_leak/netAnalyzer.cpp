@@ -182,9 +182,6 @@ void time_leak::NetAnalyzer::checkConditionallyLowEnd(time_leak::Transition *tra
 
     for (auto outputPlace = outputPlaces.begin(); outputPlace != outputPlaces.end(); ++outputPlace)
     {
-        if (outputPlace->second->GetHighIn() > 1) {
-            continue;
-        }
         map<string, Transition*> outputTransitions = outputPlace->second->GetOutElements();
         for (auto outputTransition = outputTransitions.begin(); outputTransition != outputTransitions.end(); ++outputTransition)
         {
@@ -201,7 +198,10 @@ void time_leak::NetAnalyzer::checkConditionallyLowEnd(time_leak::Transition *tra
     if (conditionallyLowEnd)
     {
         if (transition->GetTransitionType() == Transition::TransitionType::lowStart)
+        {
             transition->SetTransitionType(Transition::TransitionType::low);
+            checkIntervalOnlyCase(transition);
+        }
         else
             transition->SetTransitionType(Transition::TransitionType::lowEnd);
 
