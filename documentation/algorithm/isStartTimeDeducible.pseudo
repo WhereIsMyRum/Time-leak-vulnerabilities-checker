@@ -2,5 +2,4 @@ function isStartTimeDeducible()
     startTimeDeducible = false;
 
     if (highInputTransitions == 0)
-        if (highOutputTransitions < 2)
             startTimeDeducible = true

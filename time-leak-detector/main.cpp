@@ -26,8 +26,6 @@ int main(int argc, char *argv[])
 
     time_leak::Net *n = new time_leak::Net(time_leak::NetParser::ParseNet(argv[1]));
 
-
-
     time_leak::NetPruner nPruner;
     nPruner.PruneNet(n);
 
