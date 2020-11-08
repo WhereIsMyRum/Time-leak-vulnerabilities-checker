@@ -49,8 +49,8 @@
         }
     },
     "results": [
-        "H1-high",
-        "H2-high",
+        "H1-lowStart",
+        "H2-lowStart",
         "H3-lowStart-conditional"
     ]
 }
