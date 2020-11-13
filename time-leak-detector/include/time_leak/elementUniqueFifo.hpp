@@ -25,6 +25,10 @@ namespace time_leak
     template <class T, class T2>
     bool ForwardQueue(T &queue1, T2 &queue2, bool direction);
 
+    template <class T>
+    void Traverse(std::map<std::string, T *> elements, ElementUniqueFifo<T *> &queue);
+
+
 } // namespace time_leak
 
 #include "../../src/time_leak/elementUniqueFifo.tpp"

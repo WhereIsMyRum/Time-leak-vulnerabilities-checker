@@ -28,7 +28,7 @@ void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net, bool runConditiona
 void time_leak::NetAnalyzer::analyzeNet(time_leak::Net &net, time_leak::Place *startPlace, bool upwards)
 {
     startPlace->Analyze();
-    startPlace->Traverse(startPlace->GetElementsBasedOnDirection(upwards), this->transitionsQueue);
+    Traverse(startPlace->GetElementsBasedOnDirection(upwards), this->transitionsQueue);
 
     while (this->placesQueue.Size() > 0 || this->transitionsQueue.Size() > 0)
     {

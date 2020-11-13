@@ -112,14 +112,3 @@ bool time_leak::Element<T>::AllDirectionsAnalyzed(bool direction)
     }
     return allAnalyzed;
 }
-
-template <class T>
-void time_leak::Element<T>::Traverse(std::map<std::string, T *> elements, time_leak::ElementUniqueFifo<T *> &queue)
-{
-    typename std::map<std::string, T *>::iterator iterator;
-
-    for (iterator = elements.begin(); iterator != elements.end(); ++iterator)
-    {
-        queue.Push(iterator->second);
-    }
-}

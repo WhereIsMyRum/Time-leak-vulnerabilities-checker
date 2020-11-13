@@ -57,7 +57,7 @@ bool time_leak::ForwardQueue(T &queue1, T2 &queue2, bool direction)
         {
             auto element = queue1.Pop();
             changesMade = element->Analyze();
-            element->Traverse(element->GetElementsBasedOnDirection(direction), queue2);
+            time_leak::Traverse(element->GetElementsBasedOnDirection(direction), queue2);
         }
         else
         {
@@ -76,4 +76,16 @@ bool time_leak::ForwardQueue(T &queue1, T2 &queue2, bool direction)
     }
 
     return changesMade;
+}
+
+
+template <class T>
+void time_leak::Traverse(std::map<std::string, T *> elements, time_leak::ElementUniqueFifo<T *> &queue)
+{
+    typename std::map<std::string, T *>::iterator iterator;
+
+    for (iterator = elements.begin(); iterator != elements.end(); ++iterator)
+    {
+        queue.Push(iterator->second);
+    }
 }
