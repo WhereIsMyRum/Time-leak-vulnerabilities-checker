@@ -86,7 +86,13 @@ void time_leak::NetAnalyzer::checkIntervalOnlyCase(time_leak::Transition *transi
             {
                 if (it2->second->GetInElements().size() > 1)
                 {
-                    transition->SetTransitionType(Transition::TransitionType::maxDuration);
+                    map<string, time_leak::Place *> places2 = it2->second->GetInElements();
+                    for (auto it3 = places2.begin(); it3 != places2.end(); ++it3)
+                    {
+                        if (places.find(it3->second->GetId()) == places.end()) {
+                            transition->SetTransitionType(Transition::TransitionType::maxDuration);
+                        }
+                    }
                 }
                 else
                 {
