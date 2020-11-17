@@ -6,6 +6,8 @@ function Main(input)
         net.WasUpdated = false
 
         net.AnalyzeNet("up")
+        if (not net.WasUpdated)
+            break
         net.AnalyzeNet("down")
     end
 

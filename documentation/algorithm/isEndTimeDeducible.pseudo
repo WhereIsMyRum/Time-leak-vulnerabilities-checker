@@ -2,5 +2,4 @@ function isEndTimeDeducible()
     endTimeDeducible = false
 
     if highOutputTransitions == 0
-        if highInputTransitions < 2
             endTimeDeducible = true

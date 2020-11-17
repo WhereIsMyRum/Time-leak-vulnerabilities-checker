@@ -41,8 +41,6 @@ namespace time_leak
         void SetAnalyzed(bool analyzed);
         void Print();
         bool AllDirectionsAnalyzed(bool direction);
-        void Traverse(std::map<std::string, T *> elements, ElementUniqueFifo<T *> &queue);
-        
     };
 } // namespace time_leak
 #include "../../src/time_leak/element.tpp"

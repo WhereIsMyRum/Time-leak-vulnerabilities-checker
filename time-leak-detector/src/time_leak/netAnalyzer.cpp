@@ -9,8 +9,11 @@ void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net, bool runConditiona
         this->resetChanged();
         this->analyzeNet(net, net.GetPlaces().at("end"), true);
 
-        net.GetTransitionsQueue().Clear();
-        net.GetPlacesQueue().Clear();
+        this->transitionsQueue.Clear();
+        this->placesQueue.Clear();
+
+        if (!this->wasChanged())
+            break;
 
         this->resetAnalyzedFlag(net.GetPlaces());
         this->resetAnalyzedFlag(net.GetHighTransitions());
@@ -25,13 +28,13 @@ void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net, bool runConditiona
 void time_leak::NetAnalyzer::analyzeNet(time_leak::Net &net, time_leak::Place *startPlace, bool upwards)
 {
     startPlace->Analyze();
-    startPlace->Traverse(startPlace->GetElementsBasedOnDirection(upwards), net.GetTransitionsQueue());
+    Traverse(startPlace->GetElementsBasedOnDirection(upwards), this->transitionsQueue);
 
-    while (net.GetPlacesQueue().Size() > 0 || net.GetTransitionsQueue().Size() > 0)
+    while (this->placesQueue.Size() > 0 || this->transitionsQueue.Size() > 0)
     {
-        if (time_leak::ForwardQueue(net.GetTransitionsQueue(), net.GetPlacesQueue(), upwards))
+        if (time_leak::ForwardQueue(this->transitionsQueue, this->placesQueue, upwards))
             changesMade();
-        if (time_leak::ForwardQueue(net.GetPlacesQueue(), net.GetTransitionsQueue(), upwards))
+        if (time_leak::ForwardQueue(this->placesQueue, this->transitionsQueue, upwards))
             changesMade();
     }
 }
@@ -201,7 +204,10 @@ void time_leak::NetAnalyzer::checkConditionallyLowEnd(time_leak::Transition *tra
     if (conditionallyLowEnd)
     {
         if (transition->GetTransitionType() == Transition::TransitionType::lowStart)
+        {
             transition->SetTransitionType(Transition::TransitionType::low);
+            checkIntervalOnlyCase(transition);
+        }
         else
             transition->SetTransitionType(Transition::TransitionType::lowEnd);
 

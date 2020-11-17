@@ -8,6 +8,9 @@ namespace time_leak
     class NetAnalyzer
     {
         bool changed = true;
+        ElementUniqueFifo<Place *> placesQueue;
+        ElementUniqueFifo<Transition *> transitionsQueue;
+
         void analyzeNet(Net &net, Place *startPlace, bool upwards);
         void checkForSpecialCases(map<std::string, Transition*> &highTransitons, bool runConditional); 
         void checkIntervalOnlyCase(Transition *transition);
