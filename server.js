@@ -3,6 +3,7 @@ const childProcess = require('child_process');
 const app = express();
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const { response } = require('express');
 const PORT = 5000;
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
@@ -72,6 +73,9 @@ app.get("/nets", (request, response) => {
 });
 
 app.get("/nets/:netFile", (request, response) => {
+    if (request.params.netFile.startsWith('.')) {
+        return response.sendStatus(401);
+    }
     const file = JSON.parse(fs.readFileSync(`${__dirname}/time-leak-detector/nets/${request.params.netFile}`));
     delete file['results'];
     response.send(file);

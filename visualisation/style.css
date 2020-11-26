@@ -128,3 +128,27 @@ canvas {
 .parallel {
     background-color: #800080;
 }
+
+#doc {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#doc span {
+    text-decoration: underline;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+#doc span:hover {
+    color: blue;
+    cursor: pointer;
+}
+
+#doc img {
+    margin-top: 40px;
+    visibility: hidden;
+}
