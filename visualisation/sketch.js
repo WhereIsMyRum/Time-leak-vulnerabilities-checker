@@ -3,7 +3,7 @@ const s = ( sketch ) => {
 let _places, _transitions, _arrows, _start, _end, _mouseStartX, _mouseStartY, _draggedElement, _computed = false, _mouseIsDragged = false;
 
 sketch.setup = () => {
-    const canvas = createCanvas(windowWidth, 380);
+    const canvas = createCanvas(windowWidth*4, 380);
     canvas.mouseMoved(mouseMoved);
     canvas.mouseReleased(mouseReleased);
     canvas.mousePressed(mousePressed);

@@ -1,12 +1,16 @@
 const _ = require('lodash');
 const fs = require('fs');
-const nets = require('../visualisation/libraries/example-nets').nets;
-const netNames = ['3\.Basic-TL', '8\.Combined-TL', '2\.Example-net-2', '10\.Combined-Multiple-Layers'];
+//const nets = require('../visualisation/libraries/example-nets').nets;
+//const netNames = ['3\.Basic-TL', '8\.Combined-TL', '2\.Example-net-2', '10\.Combined-Multiple-Layers'];
 
-const firstNet = _.cloneDeep(nets[netNames[0]]);
+//const firstNet = _.cloneDeep(nets[netNames[0]]);
+const firstNet = JSON.parse(require(`${process.argv[2]}`));
 
-netNames.shift();
-const netsToJoin = netNames.map(netName => _.cloneDeep(nets[netName]));
+
+//netNames.shift();
+//const netsToJoin = netNames.map(netName => _.cloneDeep(nets[netName]));
+const netsToJoin = process.argv.slice(3, process.argv.length).map(net => JSON.parse(require(`${net}`)));
+const numberOfElements = firstNet.places.length + netsToJoin[0].places.length + firstNet.transitions.high.length + firstNet.transitions.low.length + netsToJoin[0].transitions.high.length + netsToJoin[0].transitions.low.length- 1;
 
 const pPlus = [];
 const tLowPlus = [];
@@ -64,7 +68,71 @@ netsToJoin.forEach(net => {
     first = true;
 });
 
-fs.writeFile('./output.json', JSON.stringify(firstNet, undefined, 4), err => {});
+function validateData(data) {
+    const valid = {};
+    let transitionsValues = [];
+    let placesValues = [];
+    let placesNoInput = [];
+    const placesNoOutput = [];
+
+    valid.result = true;
+    valid.issues = [];
+    Object.entries(data.flows.transitions).forEach(([key, value]) => {
+        transitionValues = transitionsValues.concat(value);
+    });
+    Object.entries(data.flows.transitions).forEach(([key, value]) => {
+        transitionsValues = transitionsValues.concat(value);
+    });
+
+    Object.entries(data.flows.places).forEach(([key, value]) => {
+        placesValues = placesValues.concat(value);
+    });
+
+    data.places.forEach(place => {
+        if (!data.flows.places[place] || data.flows.places[place].length == 0) {
+            placesNoOutput.push(place);
+        }
+        if (!transitionsValues.includes(place)) {
+            placesNoInput.push(place);
+        }
+    });
+
+    if (placesNoInput.length > 1) {
+        valid.result = false;
+        valid.issues = valid.issues.concat([`more than 1 place has no input: ${placesNoInput}`]);
+    }
+
+    if (placesNoOutput.length > 1) {
+        valid.result = false;
+        valid.issues = valid.issues.concat([`more than 1 place has no output: ${placesNoOutput}`]);
+    }
+
+    if (placesNoInput.length == 0) {
+        valid.result = false;
+        valid.issues = valid.issues.concat(['No start place']);
+    }
+
+    if (placesNoOutput.length == 0) {
+        valid.result = false;
+        valid.issues = valid.issues.concat(['No end place']);
+    }
+
+    placesNoInput.forEach(place => {
+        if (placesNoOutput.includes(place)) {
+            valid.result = false;
+            valid.issues = valid.issues.concat([`${place} has no start and no end transitions`]);
+        }
+    });
+
+    return valid
+}
+const res = validateData(firstNet)
+if (!res.result) console.log(res.issues, process.argv, firstNet)
+
+fs.writeFile('./output-run.json', JSON.stringify(firstNet), err => {})
+fs.writeFile('./output.json', JSON.stringify(JSON.stringify(firstNet)), err => {});
+console.log(numberOfElements);
+//console.log(JSON.stringify(firstNet), numberOfElements)
 
 
 

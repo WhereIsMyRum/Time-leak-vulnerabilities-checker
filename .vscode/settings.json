@@ -68,7 +68,9 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "queue": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp"
     },
     "liveServer.settings.port": 5501
 }

@@ -22,7 +22,7 @@ void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net, bool runConditiona
     }
     this->checkForSpecialCases(net.GetHighTransitions(), runConditional);
 
-    printResults(net.GetHighTransitions());
+    //printResults(net.GetHighTransitions());
 }
 
 void time_leak::NetAnalyzer::analyzeNet(time_leak::Net &net, time_leak::Place *startPlace, bool upwards)

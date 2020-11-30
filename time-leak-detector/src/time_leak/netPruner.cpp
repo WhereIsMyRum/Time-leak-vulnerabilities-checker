@@ -11,19 +11,19 @@ void time_leak::NetPruner::PruneNet(time_leak::Net *net)
         switch (this->getPruningCase(iterator->second))
         {
             case pruningCase::oneToOneFront:
-                cout << iterator->second->GetId() << " oneToOneFront" << endl;
+                //cout << iterator->second->GetId() << " oneToOneFront" << endl;
                 pruneOneToOneFront(iterator->second, net);
             break;
             case pruningCase::oneToOneBack:
                 pruneOneToOneBack(iterator->second, net);
-                cout << iterator->second->GetId() << " oneToOneBack" << endl;
+                //cout << iterator->second->GetId() << " oneToOneBack" << endl;
             break;
             case pruningCase::oneToManySingle:
-                cout << iterator->second->GetId() << " oneToManySingle" << endl;
+                //cout << iterator->second->GetId() << " oneToManySingle" << endl;
                 pruneOneToManySingle(iterator->second, net);
             break;
             case pruningCase::manyToOneSingle:
-                cout << iterator->second->GetId() << " manyToOneSingle" << endl;
+                //cout << iterator->second->GetId() << " manyToOneSingle" << endl;
                 pruneManyToOneSingle(iterator->second, net);
             break;
             default:
