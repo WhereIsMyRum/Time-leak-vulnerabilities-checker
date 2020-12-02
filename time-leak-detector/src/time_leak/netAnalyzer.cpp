@@ -191,7 +191,7 @@ void time_leak::NetAnalyzer::checkConditionallyLowEnd(time_leak::Transition *tra
         map<string, Transition*> outputTransitions = outputPlace->second->GetOutElements();
         for (auto outputTransition = outputTransitions.begin(); outputTransition != outputTransitions.end(); ++outputTransition)
         {
-            if (outputTransition->second->CheckIfLow() || outputTransition->second->GetTransitionType() == Transition::TransitionType::lowStart)
+            if ((outputTransition->second->CheckIfLow() || outputTransition->second->GetTransitionType() == Transition::TransitionType::lowStart) && !outputTransition->second->GetConditional())
             {
                 conditionallyLowEnd = true;
                 break;
