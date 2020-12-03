@@ -3,60 +3,78 @@ from Naked.toolshed.shell import muterun_js
 import subprocess, os, numpy
 import matplotlib.pyplot as plt
 import random
+from shutil import copyfile
 
+ROOT = './netPiecesPrunable/'
+outputFile = 'output.json'
 
-
-numberOfElements = 0
-
-creationDuration = [[0],[0]]
-pruningDuration = [[0],[0]]
-noPruningNoConditional = [[0],[0]]
-pruningNoConditional = [[0],[0]]
-noPruningConditional = [[0],[0]]
-
-maxNoOfElemenst = 6000
-step = 6
-
-while (numberOfElements < maxNoOfElemenst):
+def initializeOutputNet(): 
     netNum = str(random.randint(1,9))
-    output = muterun_js('join-nets.js ' + './output.json' + " " + './netPiecesPrunable/' + netNum + ".json")
-    output = output.stdout.decode("utf-8")[0:-1].split('\n')
-    print(output)
-    numberOfElements = int(output[0])
+    copyfile(ROOT + netNum + ".json", "./" + outputFile)
 
-    creation, pruning, nPnC, PnC, nPC, PC = 0, 0 ,0, 0, 0, 0
-    for i in range(0, 1) :
+def appendRandomNet():
+    netNum = str(random.randint(1,9))
+    output = muterun_js('join-nets.js ' + './' + outputFile + " " + ROOT + netNum + ".json")
+    output = output.stdout.decode("utf-8")[0:-1].split('\n')
+    return int(output[0])
+
+def runBenchmark(maxNoOfElements):
+    initializeOutputNet()
+
+    numberOfElements = 0
+    results = [[[0],[0]], [[0],[0]], [[0],[0]], [[0],[0]]]
+
+    while (numberOfElements < maxNoOfElements):
+        numberOfElements = appendRandomNet()
+
         output2 = subprocess.check_output(['main.exe', 'output-run.json']).decode("utf-8")[0:-2].split(' ')
         if output2[0] == '':
             output2[0] = '0'
-        creation += int(output2[0])
-        nPnC += int(output2[1])
-        PnC += int(output2[2])
-        nPC += int(output2[3])
 
-    creationDuration[0].append(numberOfElements)
-    creationDuration[1].append(creation)
-    noPruningNoConditional[0].append(numberOfElements)
-    noPruningNoConditional[1].append(nPnC)
-    pruningNoConditional[0].append(numberOfElements)
-    pruningNoConditional[1].append(PnC)
-    noPruningConditional[0].append(numberOfElements)
-    noPruningConditional[1].append(nPC)
+        for i in range(0, len(output2)):
+            results[i][0].append(numberOfElements)
+            results[i][1].append(int(output2[i]))
 
-line = numpy.linspace(0, maxNoOfElemenst, int(maxNoOfElemenst / step))
+    return results
 
-creation = numpy.poly1d(numpy.polyfit(creationDuration[0], creationDuration[1], 2))
-nPnC = numpy.poly1d(numpy.polyfit(noPruningNoConditional[0], noPruningNoConditional[1], 1))
-PnC = numpy.poly1d(numpy.polyfit(pruningNoConditional[0], pruningNoConditional[1], 1))
-nPC = numpy.poly1d(numpy.polyfit(noPruningConditional[0], noPruningConditional[1], 1))
+def plotResults(results, maxNoOfElements):
+    step = 6
+    creationDuration, noPruningNoConditional, pruningNoConditional, noPruningConditional = results
 
-plt.plot(line, creation(line), label="creation")
-plt.plot(line, nPnC(line), label="npnc")
-plt.plot(line, PnC(line), label="pnc")
-plt.plot(line, nPC(line), label="npc")
-plt.title('Creation duration')
-plt.xlabel('Number of elements')
-plt.legend(["Creation", "No pruning no conditional", "Pruning no conditional", "No pruning conditional"])
-plt.ylabel('time [ms]')
-plt.show()
+    line = numpy.linspace(0, maxNoOfElements, int(maxNoOfElements / step))
 
+    creation = numpy.poly1d(numpy.polyfit(creationDuration[0], creationDuration[1], 2))
+    nPnC = numpy.poly1d(numpy.polyfit(noPruningNoConditional[0], noPruningNoConditional[1], 1))
+    PnC = numpy.poly1d(numpy.polyfit(pruningNoConditional[0], pruningNoConditional[1], 1))
+    nPC = numpy.poly1d(numpy.polyfit(noPruningConditional[0], noPruningConditional[1], 1))
+
+    plt.figure(1)
+    plt.title('Creation duration')
+    plt.xlabel('Number of elements')
+    plt.ylabel('time [micro s]')
+    plt.scatter(creationDuration[0], creationDuration[1], s=1, label='Creation scatter')
+    plt.plot(line, creation(line), '-b', label="Creation duration")
+    plt.legend(loc='best')
+
+
+    plt.figure(2)
+    plt.title('Algorithm duration')
+    plt.xlabel('Number of Elements')
+    plt.ylabel('time [micro s]')
+
+    plt.plot(line, nPnC(line), '-b', label="No pruning no conditional")
+    plt.plot(line, PnC(line), '-r', label="Pruning no conditional")
+    plt.plot(line, nPC(line), '-g', label="No pruning conditional")
+    plt.legend(loc='best')
+
+
+    plt.show()
+
+def main():
+    maxNoOfElements = 3000
+
+    results = runBenchmark(maxNoOfElements)
+    plotResults(results, maxNoOfElements)
+
+
+main()
