@@ -71,7 +71,7 @@ def plotResults(results, maxNoOfElements):
     plt.show()
 
 def main():
-    maxNoOfElements = 3000
+    maxNoOfElements = 1000
 
     results = runBenchmark(maxNoOfElements)
     plotResults(results, maxNoOfElements)
