@@ -8,7 +8,6 @@
     "create-nets": "node create_nets_files.js",
     "dev": "set NODE_ENV=dev&&nodemon server.js",
     "copy-main": "docker cp <image-id>:/usr/src/app/main ./time-leak-detector",
-    "build": "docker build . -t app:latest",
     "up": "docker run -it app:latest",
     "test": "mocha test.js"
   },
