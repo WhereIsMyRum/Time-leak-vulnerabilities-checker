@@ -18,8 +18,6 @@ namespace time_leak
             map<std::string, time_leak::Place *> places;
             map<std::string, time_leak::Transition *> lowTransitions;
             map<std::string, time_leak::Transition *> highTransitions;
-            ElementUniqueFifo<Place *> placesQueue;
-            ElementUniqueFifo<Transition *> transitionsQueue;
 
         private:
             void populatePlaces();
@@ -34,8 +32,6 @@ namespace time_leak
             map<std::string, time_leak::Place *>& GetPlaces();
             map<std::string, time_leak::Transition *>& GetLowTransitions();
             map<std::string, time_leak::Transition *>& GetHighTransitions();
-            ElementUniqueFifo<Place *>& GetPlacesQueue();
-            ElementUniqueFifo<Transition *>& GetTransitionsQueue();
             void RemovePlace(std::string placeId);
             void RemoveTransition(std::string transitionId);
             void PrintNet();

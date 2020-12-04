@@ -74,6 +74,9 @@ app.get("/nets", (request, response) => {
 });
 
 app.get("/nets/:netFile", (request, response) => {
+    if (request.params.netFile.startsWith('.')) {
+        return response.sendStatus(401);
+    }
     const file = JSON.parse(fs.readFileSync(`${__dirname}/time-leak-detector/nets/${request.params.netFile}`));
     delete file['results'];
     response.send(file);

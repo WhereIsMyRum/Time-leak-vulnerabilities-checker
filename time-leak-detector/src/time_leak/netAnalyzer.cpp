@@ -9,8 +9,8 @@ void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net, bool runConditiona
         this->resetChanged();
         this->analyzeNet(net, net.GetPlaces().at("end"), true);
 
-        net.GetTransitionsQueue().Clear();
-        net.GetPlacesQueue().Clear();
+        this->transitionsQueue.Clear();
+        this->placesQueue.Clear();
 
         if (!this->wasChanged())
             break;
@@ -28,13 +28,13 @@ void time_leak::NetAnalyzer::RunAnalysis(time_leak::Net &net, bool runConditiona
 void time_leak::NetAnalyzer::analyzeNet(time_leak::Net &net, time_leak::Place *startPlace, bool upwards)
 {
     startPlace->Analyze();
-    startPlace->Traverse(startPlace->GetElementsBasedOnDirection(upwards), net.GetTransitionsQueue());
+    Traverse(startPlace->GetElementsBasedOnDirection(upwards), this->transitionsQueue);
 
-    while (net.GetPlacesQueue().Size() > 0 || net.GetTransitionsQueue().Size() > 0)
+    while (this->placesQueue.Size() > 0 || this->transitionsQueue.Size() > 0)
     {
-        if (time_leak::ForwardQueue(net.GetTransitionsQueue(), net.GetPlacesQueue(), upwards))
+        if (time_leak::ForwardQueue(this->transitionsQueue, this->placesQueue, upwards))
             changesMade();
-        if (time_leak::ForwardQueue(net.GetPlacesQueue(), net.GetTransitionsQueue(), upwards))
+        if (time_leak::ForwardQueue(this->placesQueue, this->transitionsQueue, upwards))
             changesMade();
     }
 }
@@ -89,7 +89,13 @@ void time_leak::NetAnalyzer::checkIntervalOnlyCase(time_leak::Transition *transi
             {
                 if (it2->second->GetInElements().size() > 1)
                 {
-                    transition->SetTransitionType(Transition::TransitionType::maxDuration);
+                    map<string, time_leak::Place *> places2 = it2->second->GetInElements();
+                    for (auto it3 = places2.begin(); it3 != places2.end(); ++it3)
+                    {
+                        if (places.find(it3->second->GetId()) == places.end()) {
+                            transition->SetTransitionType(Transition::TransitionType::maxDuration);
+                        }
+                    }
                 }
                 else
                 {
@@ -185,7 +191,7 @@ void time_leak::NetAnalyzer::checkConditionallyLowEnd(time_leak::Transition *tra
         map<string, Transition*> outputTransitions = outputPlace->second->GetOutElements();
         for (auto outputTransition = outputTransitions.begin(); outputTransition != outputTransitions.end(); ++outputTransition)
         {
-            if (outputTransition->second->CheckIfLow() || outputTransition->second->GetTransitionType() == Transition::TransitionType::lowStart)
+            if ((outputTransition->second->CheckIfLow() || outputTransition->second->GetTransitionType() == Transition::TransitionType::lowStart) && !outputTransition->second->GetConditional())
             {
                 conditionallyLowEnd = true;
                 break;

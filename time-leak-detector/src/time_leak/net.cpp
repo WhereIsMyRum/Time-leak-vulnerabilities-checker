@@ -121,16 +121,6 @@ map<std::string, time_leak::Transition *>& time_leak::Net::GetHighTransitions()
     return this->highTransitions;
 }
 
-time_leak::ElementUniqueFifo<time_leak::Place *>& time_leak::Net::GetPlacesQueue()
-{
-    return this->placesQueue;
-}
-
-time_leak::ElementUniqueFifo<time_leak::Transition *>& time_leak::Net::GetTransitionsQueue()
-{
-    return this->transitionsQueue;
-}
-
 void time_leak::Net::RemovePlace(string placeId)
 {
     this->places.erase(placeId);

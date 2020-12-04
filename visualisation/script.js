@@ -237,3 +237,8 @@ function setNetToDefault() {
     netHolder.value = JSON.stringify(defaultNet, undefined, 4);
     update();
 }
+
+function showDependencyGraph() {
+    const graph = document.getElementById('dependency-graph');
+    graph.style.visibility = graph.style.visibility === 'visible' ? 'hidden' : 'visible';
+}
