@@ -1,0 +1,1 @@
+"{\"places\":[\"p1\",\"p2\"],\"transitions\":{\"high\":[],\"low\":[\"L1\"]},\"flows\":{\"places\":{\"p1\":[\"L1\"]},\"transitions\":{\"L1\":[\"p2\"]}}}"

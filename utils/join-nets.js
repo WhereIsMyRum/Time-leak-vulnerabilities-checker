@@ -1,28 +1,26 @@
 const _ = require('lodash');
 const fs = require('fs');
+const generateNet = require('./net-generator');
 //const nets = require('../visualisation/libraries/example-nets').nets;
 //const netNames = ['3\.Basic-TL', '8\.Combined-TL', '2\.Example-net-2', '10\.Combined-Multiple-Layers'];
 
-//const firstNet = _.cloneDeep(nets[netNames[0]]);
+
 const firstNet = JSON.parse(require(`${process.argv[2]}`));
 
-
-//netNames.shift();
-//const netsToJoin = netNames.map(netName => _.cloneDeep(nets[netName]));
-const netsToJoin = process.argv.slice(3, process.argv.length).map(net => JSON.parse(require(`${net}`)));
-const numberOfElements = firstNet.places.length + netsToJoin[0].places.length + firstNet.transitions.high.length + firstNet.transitions.low.length + netsToJoin[0].transitions.high.length + netsToJoin[0].transitions.low.length- 1;
+const netsToJoin = generateNet();//process.argv.slice(3, process.argv.length).map(net => JSON.parse(require(`${net}`)));
+const numberOfElements = firstNet.places.length + netsToJoin[0].places.length + firstNet.transitions.high.length + firstNet.transitions.low.length + netsToJoin[0].transitions.high.length + netsToJoin[0].transitions.low.length - 1;
 
 const pPlus = [];
 const tLowPlus = [];
 const tHighPlus = [];
 pPlus[0] = Number(firstNet.places[firstNet.places.length - 1].substr(1)) - 1;
-tLowPlus[0] = Number(firstNet.transitions.low[firstNet.transitions.low.length - 1].substring(1));
-tHighPlus[0] = Number(firstNet.transitions.high[firstNet.transitions.high.length - 1].substring(1));
+tLowPlus[0] = firstNet.transitions.low.length > 0 ? Number(firstNet.transitions.low[firstNet.transitions.low.length - 1].substring(1)) : 0
+tHighPlus[0] = firstNet.transitions.high.length > 0 ? Number(firstNet.transitions.high[firstNet.transitions.high.length - 1].substring(1)) : 0;
 
 netsToJoin.forEach(net => {
     pPlus.push(Number(net.places[net.places.length - 1].substr(1)) - 1);
-    tLowPlus.push(Number(net.transitions.low[net.transitions.low.length - 1].substring(1)));
-    tHighPlus.push(Number(net.transitions.high[net.transitions.high.length - 1].substring(1)));''
+    tLowPlus.push(net.transitions.low.length > 0 ? Number(net.transitions.low[net.transitions.low.length - 1].substring(1)) : 0);
+    tHighPlus.push(net.transitions.high.length > 0 ? Number(net.transitions.high[net.transitions.high.length - 1].substring(1)) : 0);
 })
 
 
@@ -42,9 +40,11 @@ netsToJoin.forEach(net => {
         firstNet.transitions.low.push(`L${Number(transition.substring(1)) + Lplus}`);
     });
 
+
     net.transitions.high.forEach(transition => {
-        firstNet.transitions.high.push(`H${Number(transition.substring(1)) + Hplus}`);
+         firstNet.transitions.high.push(`H${Number(transition.substring(1)) + Hplus}`);
     });
+
 
     Object.entries(net.flows.places).forEach(([key, val]) => {
         val = val.map(v => {
@@ -127,12 +127,12 @@ function validateData(data) {
     return valid
 }
 const res = validateData(firstNet)
-if (!res.result) console.log(res.issues, process.argv, firstNet)
+if (!res.result) console.log(res.issues)
 
-fs.writeFile('./output-run.json', JSON.stringify(firstNet), err => {})
-fs.writeFile('./output.json', JSON.stringify(JSON.stringify(firstNet)), err => {});
-console.log(numberOfElements);
-//console.log(JSON.stringify(firstNet), numberOfElements)
+fs.writeFile('./output-run.json', JSON.stringify(firstNet), err => { })
+fs.writeFile('./output.json', JSON.stringify(JSON.stringify(firstNet)), err => { });
+//console.log(numberOfElements);
+console.log(JSON.stringify(firstNet), numberOfElements)
 
 
 

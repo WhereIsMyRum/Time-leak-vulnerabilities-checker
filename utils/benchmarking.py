@@ -10,7 +10,7 @@ outputFile = 'output.json'
 
 def initializeOutputNet(): 
     netNum = str(random.randint(1,9))
-    copyfile(ROOT + netNum + ".json", "./" + outputFile)
+    copyfile("./baseNet.json", "./" + outputFile)
 
 def appendRandomNet():
     netNum = str(random.randint(1,9))

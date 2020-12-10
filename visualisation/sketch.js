@@ -59,7 +59,7 @@ class Shape {
         if (this.id === _end) {
             this.x = coordinates.x += 2 * PLUS_X
             this.y = BASE_Y;
-            if (this.x >= windowWidth || this.y >= windowHeight) adjustCanvas(this.x, this.y);
+            if (this.x >= windowWidth || this.y >= windowHeight) adjustCanvas(this.x + 5000, this.y + 5000);
         } else {
             this.x = coordinates.x;
             this.y = coordinates.y;

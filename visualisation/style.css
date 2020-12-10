@@ -5,6 +5,7 @@ html, body {
 
 canvas {
   display: block;
+  overflow: visible;
 }
 
 #net-input-holder {
