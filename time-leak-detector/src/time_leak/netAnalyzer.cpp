@@ -76,8 +76,10 @@ void time_leak::NetAnalyzer::checkForSpecialCases(map<string, time_leak::Transit
 
 void time_leak::NetAnalyzer::checkIntervalOnlyCase(time_leak::Transition *transition)
 {
-    if (transition->GetTransitionType() != Transition::TransitionType::low)
+    if (transition->GetTransitionType() != Transition::TransitionType::low && transition->GetTransitionType() != Transition::TransitionType::lowEnd)
         return;
+
+    Transition::TransitionType initialTransitionType = transition->GetTransitionType();
 
     map<string, time_leak::Place *> places = transition->GetOutElements();
     for (auto it1 = places.begin(); it1 != places.end(); ++it1)
@@ -92,14 +94,30 @@ void time_leak::NetAnalyzer::checkIntervalOnlyCase(time_leak::Transition *transi
                     map<string, time_leak::Place *> places2 = it2->second->GetInElements();
                     for (auto it3 = places2.begin(); it3 != places2.end(); ++it3)
                     {
-                        if (places.find(it3->second->GetId()) == places.end()) {
-                            transition->SetTransitionType(Transition::TransitionType::maxDuration);
+                        if (places.find(it3->second->GetId()) == places.end())
+                        {
+                            if (transition->GetTransitionType() == Transition::TransitionType::low)
+                            {
+                                transition->SetTransitionType(Transition::TransitionType::maxDuration);
+                            }
+
+                            if (transition->GetTransitionType() == Transition::TransitionType::lowEnd)
+                            {
+                                map<string, time_leak::Transition *> transitions2 = it3->second->GetInElements();
+                                for (auto it4 = transitions2.begin(); it4 != transitions2.end(); ++it4)
+                                {
+                                    if (!it4->second->CheckIfLow())
+                                    {
+                                        transition->SetTransitionType(Transition::TransitionType::high);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
                 else
                 {
-                    transition->SetTransitionType(Transition::TransitionType::low);
+                    transition->SetTransitionType(initialTransitionType);
                     return;
                 }
             }
