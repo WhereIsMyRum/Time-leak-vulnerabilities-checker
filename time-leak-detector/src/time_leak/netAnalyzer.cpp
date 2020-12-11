@@ -150,7 +150,13 @@ void time_leak::NetAnalyzer::checkConditionallyLowStart(time_leak::Transition *t
         map<string, time_leak::Transition *> inputTransitions = inputPlace->second->GetInElements();
         for (auto inputTransition = inputTransitions.begin(); inputTransition != inputTransitions.end(); ++inputTransition)
         {
-            if (inputTransition->second->CheckIfLow() && inputPlace->second->GetHighOut() < 2 && !inputTransition->second->GetConditional())
+            if (transition->GetTransitionType() == Transition::TransitionType::high && (inputTransition->second->CheckIfLow() || inputTransition->second->GetTransitionType() == Transition::TransitionType::lowEnd) && !inputTransition->second->GetConditional())
+            {
+                transition->SetTransitionType(Transition::TransitionType::lowStart);
+                transition->SetConditional();
+                return;
+            }
+            else if (inputTransition->second->CheckIfLow() && inputPlace->second->GetHighOut() < 2 && !inputTransition->second->GetConditional())
             {
                 conditionally = true;
             } 
@@ -182,7 +188,6 @@ void time_leak::NetAnalyzer::checkConditionallyLowStart(time_leak::Transition *t
         if (!conditionally)
         {
             conditionallyLowStart = false;
-            break;
         }
     }
 
