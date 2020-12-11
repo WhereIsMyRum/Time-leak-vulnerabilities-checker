@@ -76,7 +76,7 @@ void time_leak::NetAnalyzer::checkForSpecialCases(map<string, time_leak::Transit
 
 void time_leak::NetAnalyzer::checkIntervalOnlyCase(time_leak::Transition *transition)
 {
-    if (transition->GetTransitionType() != Transition::TransitionType::low)
+    if (transition->GetTransitionType() != Transition::TransitionType::low || transition->GetTransitionType() != Transition::TransitionType::lowEnd)
         return;
 
     map<string, time_leak::Place *> places = transition->GetOutElements();
@@ -89,6 +89,11 @@ void time_leak::NetAnalyzer::checkIntervalOnlyCase(time_leak::Transition *transi
             {
                 if (it2->second->GetInElements().size() > 1)
                 {
+                    if(transition->GetTransitionType() == Transition::TransitionType::lowEnd) {
+                        transition->SetTransitionType(Transition::TransitionType::high);
+                        return;
+                    }
+
                     map<string, time_leak::Place *> places2 = it2->second->GetInElements();
                     for (auto it3 = places2.begin(); it3 != places2.end(); ++it3)
                     {

@@ -1,11 +1,12 @@
 const { json } = require("body-parser");
+const { add } = require("lodash");
 
 let currentMaxPlace = 2
 let currentMaxHigh = 0
 let currentMaxLow = 1
 
-function generateNet(net = { "places": ["p1", "p2"], "transitions": { "high": [], "low": ["L1"] }, "flows": { "places": {"p1":["L1"]}, "transitions": {"L1":["p2"]} } }, recursionDepth = 0, distributions = [20, 20, 0, 0, 60]) {
-    switch (getType(distributions)) {
+function generateNet(net = { "places": ["p1", "p2"], "transitions": { "high": [], "low": ["L1"] }, "flows": { "places": { "p1": ["L1"] }, "transitions": { "L1": ["p2"] } } }, recursionDepth = 0, distribution = [10, 10, 20, 30, 30], previous = {type: 1}) {
+    switch (getType(distribution)) {
         case 1:
             returnNet = getBaseLow(net);
             break;
@@ -13,29 +14,24 @@ function generateNet(net = { "places": ["p1", "p2"], "transitions": { "high": []
             returnNet = getBaseHigh(net);
             break;
         case 3:
-            returnNet = getSequentialComposition(net, recursionDepth + 1, distributions);
+            returnNet = getSequentialComposition(net, recursionDepth + 1, distribution);
             break;
         case 4:
-            returnNet = getBranchingComposition(net, recursionDepth + 1, distributions);
+            returnNet = getBranchingComposition(net, recursionDepth + 1, distribution, previous);
             break;
         case 5:
-            returnNet = getParallelComposition(net, recursionDepth + 1, distributions);
+            returnNet = getParallelComposition(net, recursionDepth + 1, distribution, previous);
             break;
     }
 
-    returnNet.places = returnNet.places.filter((item, i, ar) => ar.indexOf(item) === i)
-    returnNet.transitions.high = returnNet.transitions.high.filter((item, i, ar) => ar.indexOf(item) === i)
-    returnNet.transitions.low = returnNet.transitions.low.filter((item, i, ar) => ar.indexOf(item) === i)
-
     if (recursionDepth === 0) {
-        console.log(JSON.stringify(returnNet));
-        return renumberElements([addEndPlace(returnNet)]);
+        return [returnNet];
     }
     return returnNet;
 }
 
-function getType(distributions) {
-    const ranges = getRanges(distributions);
+function getType(distribution) {
+    const ranges = getRanges(distribution);
     const random = getRandom();
     for (let i = 0; i < ranges.length; ++i) {
         if (random >= ranges[i][0] && random <= ranges[i][1]) {
@@ -48,13 +44,13 @@ function getRandom() {
     return Math.floor(Math.random() * 100)
 }
 
-function getRanges(distributions) {
+function getRanges(distribution) {
     const ranges = [];
-    for (let i = 0; i < distributions.length; ++i) {
+    for (let i = 0; i < distribution.length; ++i) {
         if (i === 0) {
-            ranges.push([0, distributions[i] - 1])
+            ranges.push([0, distribution[i] - 1])
         } else {
-            ranges.push([ranges[i - 1][1] + 1, ranges[i - 1][1] + distributions[i]])
+            ranges.push([ranges[i - 1][1] + 1, ranges[i - 1][1] + distribution[i]])
         }
     }
 
@@ -62,14 +58,13 @@ function getRanges(distributions) {
 }
 
 function getBaseHigh(net) {
-    const netMaxs = getNetMaxs();
-    let maxPlace = netMaxs.maxPlace > 0 ? netMaxs.maxPlace - 1 : 0;
+    const netMax = getNetMax()
 
-    net.places.push(`p${maxPlace + 2}`);
-    net.transitions.high.push(`H${netMaxs.maxHigh + 1}`);
+    net.places.push(`p${netMax.maxPlace + 1}`);
+    net.transitions.high.push(`H${netMax.maxHigh + 1}`);
 
-    net.flows.places[`p${maxPlace + 1}`] = [`H${netMaxs.maxHigh + 1}`];
-    net.flows.transitions[`H${netMaxs.maxHigh + 1}`] = [`p${maxPlace + 2}`];
+    net.flows.places[`p${netMax.maxPlace}`] = [`H${netMax.maxHigh + 1}`];
+    net.flows.transitions[`H${netMax.maxHigh + 1}`] = [`p${netMax.maxPlace + 1}`];
 
     currentMaxHigh += 1;
     currentMaxPlace += 1;
@@ -78,15 +73,13 @@ function getBaseHigh(net) {
 }
 
 function getBaseLow(net) {
-    const netMaxs = getNetMaxs()
-    let maxPlace = netMaxs.maxPlace > 0 ? netMaxs.maxPlace - 1 : 0;
+    const netMax = getNetMax()
 
-    net.places.push(`p${maxPlace + 2}`);
-    net.transitions.low.push(`L${netMaxs.maxLow + 1}`);
+    net.places.push(`p${netMax.maxPlace + 1}`);
+    net.transitions.low.push(`L${netMax.maxLow + 1}`);
 
-    net.flows.places[`p${maxPlace + 1}`] = [`L${netMaxs.maxLow + 1}`];
-    net.flows.transitions[`L${netMaxs.maxLow + 1}`] = [`p${maxPlace + 2}`];
-
+    net.flows.places[`p${netMax.maxPlace}`] = [`L${netMax.maxLow + 1}`];
+    net.flows.transitions[`L${netMax.maxLow + 1}`] = [`p${netMax.maxPlace + 1}`];
 
     currentMaxLow += 1;
     currentMaxPlace += 1;
@@ -98,244 +91,216 @@ function getSequentialComposition(net, recursionDepth, distribution) {
     if (recursionDepth > 10) {
         distribution = [50, 50, 0, 0, 0];
     }
-    let netOutput = generateNet(net, recursionDepth, distribution);
-    netOutput = generateNet(netOutput, recursionDepth, distribution);
+    let netOutput = generateNet(net, recursionDepth, distribution, {type: 3});
+    netOutput = generateNet(netOutput, recursionDepth, distribution, {type: 3});
 
     return netOutput;
 }
 
 
-function getBranchingComposition(baseNet, recursionDepth, distributions) {
-    if (recursionDepth > 5) {
-        distributions = [50, 50, 0, 0, 0]
+function getBranchingComposition(baseNet, recursionDepth, distribution, previous) {
+    if (recursionDepth > 3) {
+        distribution = [50, 50, 0, 0, 0]
     }
 
-    const branchNet1 = generateNetBasedOnLimits(getNetMaxs(), recursionDepth, distributions);
-    const branchNet2 = generateNetBasedOnLimits(getNetMaxs(), recursionDepth, distributions);
-
-    return joinBranches(baseNet, branchNet1, branchNet2);
-}
-
-function getParallelComposition(baseNet, recursionDepth, distributions) {
-    if (recursionDepth > 2) {
-        distributions = [50, 50, 0, 0, 0]
+    let startPlace = baseNet.places[baseNet.places.length - 1];
+    if (previous.type === 4) {
+        startPlace = previous.startPlace;
     }
 
-    const parallelNet1 = generateNetBasedOnLimits(getNetMaxs(), recursionDepth, distributions);
-    const parallelNet2 = generateNetBasedOnLimits(getNetMaxs(), recursionDepth, distributions);
+    const branchOne = getBranch(startPlace, recursionDepth, distribution, previous);
+    const branchTwo = getBranch(startPlace, recursionDepth, distribution, previous);
 
-    return joinParallel(baseNet, parallelNet1, parallelNet2);
-}
 
-function getNetMaxs() {
-    const netMaxs = {};
-
-    netMaxs.maxPlace = currentMaxPlace;
-    netMaxs.maxHigh = currentMaxHigh;
-    netMaxs.maxLow = currentMaxLow;
-
-    return netMaxs;
-}
-
-function generateNetBasedOnLimits(netMaxs, recursionDepth, distributions) {
-
-    const highTransitionsMax = netMaxs.maxHigh != 0 ? [`H${netMaxs.maxHigh}`] : []
-    const lowTransitionsMax = netMaxs.maxLow != 0 ? [`L${netMaxs.maxLow}`] : []
-    let baseNet = { "places": [`p${netMaxs.maxPlace}`], "transitions": { "high": highTransitionsMax, "low": lowTransitionsMax }, "flows": { "places": {}, "transitions": {} } };
-
-    baseNet = generateNet(baseNet, recursionDepth, distributions);
-
-    if (netMaxs.maxHigh  > 0) baseNet.transitions.high.shift()
-    if (netMaxs.maxLow > 0) baseNet.transitions.low.shift();
+    if (previous.type !== 4) {
+        baseNet = mergeNetTwoToOne(baseNet, branchOne);
+        baseNet = mergeNetTwoToOne(baseNet, branchTwo);
+        baseNet = mergeBranches(baseNet);
+    } else {
+        baseNet = mergeNetTwoToOne(branchOne, branchTwo);
+    }
 
     return baseNet;
+
 }
 
-function printNet(net) {
-    console.log(net.places);
-    console.log(net.transitions)
-    console.log(net.flows.places)
-    console.log(net.flows.transitions)
-}
-
-function joinBranches(baseNet, branch1, branch2) {
-    const startPlace = branch1.places.shift();
-    const secondBranchStart = branch2.places.shift();
-
-    [branch1, branch2] = makeCommonEndPlace(branch1, branch2, baseNet)
-    branch1.flows.places[startPlace] = branch1.flows.places[startPlace].concat(branch2.flows.places[secondBranchStart]);
-    delete branch2.flows.places[secondBranchStart];
-
-    baseNet.places = baseNet.places.concat(branch1.places, branch2.places)
-    baseNet.transitions.high = baseNet.transitions.high.concat(branch1.transitions.high, branch2.transitions.high)
-    baseNet.transitions.low = baseNet.transitions.low.concat(branch1.transitions.low, branch2.transitions.low)
-
-    Object.keys(branch1.flows.places).forEach(key => {
-        if (!baseNet.flows.places[key]) baseNet.flows.places[key] = [];
-        baseNet.flows.places[key] = baseNet.flows.places[key].concat(branch1.flows.places[key]);
-    })
-
-    Object.keys(branch2.flows.places).forEach(key => {
-        if (!baseNet.flows.places[key]) baseNet.flows.places[key] = [];
-        baseNet.flows.places[key] = baseNet.flows.places[key].concat(branch2.flows.places[key]);
-    })
-
-    Object.keys(branch1.flows.transitions).forEach(key => {
-        if (!baseNet.flows.transitions[key]) baseNet.flows.transitions[key] = []
-        baseNet.flows.transitions[key] = baseNet.flows.transitions[key].concat(branch1.flows.transitions[key])
-    })
-
-    Object.keys(branch2.flows.transitions).forEach(key => {
-        if (!baseNet.flows.transitions[key]) baseNet.flows.transitions[key] = []
-        baseNet.flows.transitions[key] = baseNet.flows.transitions[key].concat(branch2.flows.transitions[key])
-    })
-
-    return baseNet;
-}
-
-function joinParallel(baseNet, parallel1, parallel2) {
-    let netMaxs = getNetMaxs();
-    const parallel1StartPlace = parallel1.places.shift();
-    const parallel2StartPlace = parallel2.places.shift();
-    let newStartTransition;
-
-    if (getType([50,50,0,0,0] === 1)) {
-        newStartTransition = `L${netMaxs.maxLow + 1}`;
-        parallel1.transitions.low.push(newStartTransition);
-        currentMaxLow += 1;
-    } else {
-        newStartTransition = `H${netMaxs.maxHigh + 1}`;
-        parallel1.transitions.high.push(newStartTransition);
-        currentMaxHigh =+ 1;
+function getBranch(startPlace, recursionDepth, distribution, previous) {
+    const branch = generateNet(getInitialNet(startPlace), recursionDepth, distribution, {type: 4, startPlace: startPlace});
+    if (previous.type !== 4) {
+        branch.places.shift();
     }
 
-    let newPlace = `p${netMaxs.maxPlace + 1}`;
-    currentMaxPlace += 1
-    parallel1.places.push(newPlace);
-
-    parallel1.flows.places[newPlace] = parallel1.flows.places[parallel1StartPlace];
-    parallel1.flows.places[parallel1StartPlace] = [newStartTransition];
-    parallel1.flows.transitions[newStartTransition] = [newPlace];
-
-    newPlace = `p${netMaxs.maxPlace + 2}`;
-    currentMaxPlace += 1
-    parallel2.places.push(newPlace);
-    parallel2.flows.places[newPlace] = parallel2.flows.places[parallel2StartPlace]
-    delete parallel2.flows.places[parallel2StartPlace];
-    parallel2.flows.transitions[newStartTransition] = [newPlace];
-
-    const parallel1EndPlace = findEndPlace(parallel1);
-    const parallel2EndPlace = findEndPlace(parallel2);
-
-    netMaxs = getNetMaxs();
-    let newTransition;
-    if (getType([50, 50, 0, 0, 0]) == 1) {
-        newTransition = `L${netMaxs.maxLow + 1}`;
-        parallel1.transitions.low.push(newTransition);
-        currentMaxLow += 1;
-    } {
-        newTransition = `H${netMaxs.maxHigh + 1}`;
-        parallel1.transitions.high.push(newTransition);
-        currentMaxHigh += 1;
-    }
-    parallel1.flows.places[parallel1EndPlace] = [newTransition];
-    parallel2.flows.places[parallel2EndPlace] = [newTransition];
-    parallel1.places.push(`p${netMaxs.maxPlace + 1}`);
-    currentMaxPlace += 1;
-    parallel1.flows.transitions[newTransition] = [`p${netMaxs.maxPlace + 1}`];
-
-    baseNet.places = baseNet.places.concat(parallel1.places, parallel2.places)
-    baseNet.transitions.high = baseNet.transitions.high.concat(parallel1.transitions.high, parallel2.transitions.high)
-    baseNet.transitions.low = baseNet.transitions.low.concat(parallel1.transitions.low, parallel2.transitions.low)
-
-    Object.keys(parallel1.flows.places).forEach(key => {
-        if (!baseNet.flows.places[key]) baseNet.flows.places[key] = [];
-        baseNet.flows.places[key] = baseNet.flows.places[key].concat(parallel1.flows.places[key]);
-    })
-
-    Object.keys(parallel2.flows.places).forEach(key => {
-        if (!baseNet.flows.places[key]) baseNet.flows.places[key] = [];
-        baseNet.flows.places[key] = baseNet.flows.places[key].concat(parallel2.flows.places[key]);
-    })
-
-    Object.keys(parallel1.flows.transitions).forEach(key => {
-        if (!baseNet.flows.transitions[key]) baseNet.flows.transitions[key] = []
-        baseNet.flows.transitions[key] = baseNet.flows.transitions[key].concat(parallel1.flows.transitions[key])
-    })
-
-    Object.keys(parallel2.flows.transitions).forEach(key => {
-        if (!baseNet.flows.transitions[key]) baseNet.flows.transitions[key] = []
-        baseNet.flows.transitions[key] = baseNet.flows.transitions[key].concat(parallel2.flows.transitions[key])
-    })
-
-    return baseNet;
+    return branch;
 }
 
-function makeCommonEndPlace(branch1, branch2) {
-    const b1EndPlace = findEndPlace(branch1)
-    const b2EndPlace = findEndPlace(branch2)
-    let maxNets = getNetMaxs();
-    
-    if (getType([50,50,0,0,0]) === 1) {
-        branch1.transitions.low.push(`L${maxNets.maxLow + 1}`)
-        branch1.flows.places[b1EndPlace] = [`L${maxNets.maxLow + 1}`];
-        branch1.flows.transitions[`L${maxNets.maxLow + 1}`] = [`p${maxNets.maxPlace + 1}`]
-        currentMaxLow += 1;
-    } else {
-        branch1.transitions.high.push(`H${maxNets.maxHigh + 1}`)
-        branch1.flows.places[b1EndPlace] = [`H${maxNets.maxHigh + 1}`];
-        branch1.flows.transitions[`H${maxNets.maxHigh + 1}`] = [`p${maxNets.maxPlace + 1}`]
-        currentMaxHigh += 1;
-    }
+function mergeNetTwoToOne(base, second) {
+    base.places = base.places.concat(second.places);
+    base.transitions.low = base.transitions.low.concat(second.transitions.low);
+    base.transitions.high = base.transitions.high.concat(second.transitions.high);
 
-    branch1.places.push(`p${maxNets.maxPlace + 1}`);
-    currentMaxPlace += 1;
-    maxNets = getNetMaxs();
-
-    if (getType([50,50,0,0,0]) === 1) {
-        branch2.transitions.low.push(`L${maxNets.maxLow + 1}`)
-        branch2.flows.places[b2EndPlace] = [`L${maxNets.maxLow + 1}`];
-        branch2.flows.transitions[`L${maxNets.maxLow + 1}`] = [`p${maxNets.maxPlace}`]
-        currentMaxLow += 1;
-    } else {
-        branch2.transitions.high.push(`H${maxNets.maxHigh + 1}`)
-        branch2.flows.places[b2EndPlace] = [`H${maxNets.maxHigh + 1}`];
-        branch2.flows.transitions[`H${maxNets.maxHigh + 1}`] = [`p${maxNets.maxPlace}`]
-        currentMaxHigh += 1;
-    }
-
-    return [branch1, branch2];
-}
-
-function findEndPlace(net) {
-    let pId;
-    net.places.forEach(place => {
-        if (!net.flows.places[place]) {
-            pId = place;
-        }
+    Object.keys(second.flows.places).forEach(key => {
+        if (!base.flows.places[key]) base.flows.places[key] = [];
+        base.flows.places[key] = base.flows.places[key].concat(second.flows.places[key]);
     })
 
-    return pId;
+    Object.keys(second.flows.transitions).forEach(key => {
+        if (!base.flows.transitions[key]) base.flows.transitions[key] = [];
+        base.flows.transitions[key] = base.flows.transitions[key].concat(second.flows.transitions[key]);
+    })
+
+    return base;
 }
 
-function addEndPlace(net) {
-    const endPlace = findEndPlace(net);
-    const netMaxs = getNetMaxs();
+function mergeBranches(net) {
+    const placesWithNoOutput = getPlacesWithNoOutput(net)
 
-    if (getType([50,50,0,0,0]) === 1) {
-        net.transitions.low.push(`L${netMaxs.maxLow + 1}`)
-        net.flows.places[endPlace] = [`L${netMaxs.maxLow + 1}`]
-        net.flows.transitions[`L${netMaxs.maxLow + 1}`] = [`p${netMaxs.maxPlace + 1}`];
-    } else {
-        net.transitions.high.push(`H${netMaxs.maxHigh + 1}`)
-        net.flows.places[endPlace] = [`H${netMaxs.maxHigh + 1}`]
-        net.flows.transitions[`H${netMaxs.maxHigh + 1}`] = [`p${netMaxs.maxPlace + 1}`];
+    if (placesWithNoOutput.length > 1) {
+        const newTransitions = []
+        let newPlace = getNewPlace();
+        net.places.push(newPlace);
+
+        placesWithNoOutput.forEach(place => {
+            const transition = getRandomTransition();
+            newTransitions.push(transition);
+
+            transition.charAt(0) === 'L' ? net.transitions.low.push(transition) : net.transitions.high.push(transition);
+            net.flows.places[place] = [transition];
+        });
+
+        newTransitions.forEach(transition => {
+            net.flows.transitions[transition] = [newPlace];
+        })
+
+        const lastTransition = getRandomTransition();
+        lastTransition.charAt(0) === 'L' ? net.transitions.low.push(lastTransition) : net.transitions.high.push(lastTransition);
+        net.flows.places[newPlace] = [lastTransition];
+
+        newPlace = getNewPlace();
+        net.places.push(newPlace);
+        net.flows.transitions[lastTransition] = [newPlace];
     }
-
-    net.places.push(`p${netMaxs.maxPlace + 1}`);
 
     return net;
 }
 
+function getPlacesWithNoOutput(net) {
+    return net.places.filter(place => !net.flows.places[place] || net.flows.places[place].length === 0);
+}
+
+function getParallelComposition(baseNet, recursionDepth, distribution, previous) {
+    if (recursionDepth > 3) {
+        distribution = [50, 50, 0, 0, 0]
+    }
+
+    let parallelOne;
+    let parallelTwo;
+    if (previous.type === 5) {
+        const startTransition = previous.startTransition;
+        parallelOne = getParallel(startTransition, recursionDepth, distribution, {type: previous.type, startTransition: startTransition});
+        parallelTwo = getParallel(startTransition, recursionDepth, distribution, {type: previous.type, startTransition: startTransition});
+        baseNet = mergeNetTwoToOne(parallelOne, parallelTwo);
+    } else {
+        const baseEndPlace = baseNet.places[baseNet.places.length - 1];
+        const startTransition = getRandomTransition();
+        startTransition.charAt(0) === 'L' ? baseNet.transitions.low.push(startTransition) : baseNet.transitions.high.push(startTransition);
+        baseNet.flows.places[baseEndPlace] = [startTransition];
+        parallelOne = getParallel(startTransition, recursionDepth, distribution, {type: previous.type, startTransition: startTransition});
+        parallelTwo = getParallel(startTransition, recursionDepth, distribution, {type: previous.type, startTransition: startTransition});
+        baseNet = mergeNetTwoToOne(baseNet, parallelOne);
+        baseNet = mergeNetTwoToOne(baseNet, parallelTwo);
+        baseNet = mergeParallel(baseNet);
+    }
+
+
+    return baseNet;
+}
+
+function getParallel(startTransition, recursionDepth, distribution, previous) {
+    const parallel = generateNet(getInitialNet(), recursionDepth, distribution, {type: 5, startTransition: previous.startTransition});
+    const parallelStartPlace = parallel.places[0];
+
+
+        if (!parallel.flows.transitions[startTransition]) parallel.flows.transitions[startTransition] = [];
+        parallel.flows.transitions[startTransition] = parallel.flows.transitions[startTransition].concat([parallelStartPlace]);
+
+
+    return parallel;
+}
+
+function mergeParallel(net) {
+    const placesWithNoOutput = getPlacesWithNoOutput(net)
+
+    if (placesWithNoOutput.length > 0) {
+        const newTransition = getRandomTransition();
+        newTransition.charAt(0) === 'L' ? net.transitions.low.push(newTransition) : net.transitions.high.push(newTransition);
+
+        placesWithNoOutput.forEach(place => {
+            net.flows.places[place] = [newTransition];
+        })
+
+        const newPlace = getNewPlace();
+        net.places.push(newPlace);
+        net.flows.transitions[newTransition] = [newPlace];
+    }
+
+    return net;
+}
+
+function getNetMax() {
+    const netMax = {};
+
+    netMax.maxPlace = currentMaxPlace;
+    netMax.maxHigh = currentMaxHigh;
+    netMax.maxLow = currentMaxLow;
+
+    return netMax;
+}
+
+function getInitialNet(startPlace) {
+    const netMax = getNetMax();
+    let addedPlace = `p${netMax.maxPlace + 1}`
+
+    if (!startPlace) {
+        startPlace = `p${netMax.maxPlace + 1}`;
+        addedPlace = `p${netMax.maxPlace + 2}`;
+        currentMaxPlace += 1;
+    }
+
+    if (getType([50, 50, 0, 0, 0]) === 1) {
+        const net = { "places": [startPlace, addedPlace], "transitions": { "high": [], "low": [`L${netMax.maxLow + 1}`] }, "flows": { "places": {}, "transitions": {} } }
+        net.flows.places[startPlace] = [`L${netMax.maxLow + 1}`];
+        net.flows.transitions[`L${netMax.maxLow + 1}`] = [addedPlace];
+        currentMaxPlace += 1;
+        currentMaxLow += 1;
+
+        return net;
+    }
+
+    const net = { "places": [startPlace, addedPlace], "transitions": { "high": [`H${netMax.maxHigh + 1}`], "low": [] }, "flows": { "places": {}, "transitions": {} } }
+    net.flows.places[startPlace] = [`H${netMax.maxHigh + 1}`];
+    net.flows.transitions[`H${netMax.maxHigh + 1}`] = [addedPlace];
+    currentMaxPlace += 1;
+    currentMaxHigh += 1
+
+    return net;
+}
+
+function getRandomTransition(creteNew = true) {
+    const netMax = getNetMax();
+    if (getType([50, 50, 0, 0, 0]) === 1) {
+        currentMaxLow += 1;
+        return `L${netMax.maxLow + 1}`
+    }
+
+    currentMaxHigh += 1;
+    return `H${netMax.maxHigh + 1}`;
+}
+
+function getNewPlace() {
+    const netMax = getNetMax();
+    currentMaxPlace += 1;
+
+    return `p${netMax.maxPlace + 1}`;
+}
 
 module.exports = generateNet;
