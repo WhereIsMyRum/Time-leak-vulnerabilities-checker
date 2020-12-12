@@ -76,8 +76,10 @@ void time_leak::NetAnalyzer::checkForSpecialCases(map<string, time_leak::Transit
 
 void time_leak::NetAnalyzer::checkIntervalOnlyCase(time_leak::Transition *transition)
 {
-    if (transition->GetTransitionType() != Transition::TransitionType::low || transition->GetTransitionType() != Transition::TransitionType::lowEnd)
+    if (transition->GetTransitionType() != Transition::TransitionType::low && transition->GetTransitionType() != Transition::TransitionType::lowEnd)
         return;
+
+    Transition::TransitionType initialTransitionType = transition->GetTransitionType();
 
     map<string, time_leak::Place *> places = transition->GetOutElements();
     for (auto it1 = places.begin(); it1 != places.end(); ++it1)
@@ -97,14 +99,30 @@ void time_leak::NetAnalyzer::checkIntervalOnlyCase(time_leak::Transition *transi
                     map<string, time_leak::Place *> places2 = it2->second->GetInElements();
                     for (auto it3 = places2.begin(); it3 != places2.end(); ++it3)
                     {
-                        if (places.find(it3->second->GetId()) == places.end()) {
-                            transition->SetTransitionType(Transition::TransitionType::maxDuration);
+                        if (places.find(it3->second->GetId()) == places.end())
+                        {
+                            if (transition->GetTransitionType() == Transition::TransitionType::low)
+                            {
+                                transition->SetTransitionType(Transition::TransitionType::maxDuration);
+                            }
+
+                            if (transition->GetTransitionType() == Transition::TransitionType::lowEnd)
+                            {
+                                map<string, time_leak::Transition *> transitions2 = it3->second->GetInElements();
+                                for (auto it4 = transitions2.begin(); it4 != transitions2.end(); ++it4)
+                                {
+                                    if (!it4->second->CheckIfLow())
+                                    {
+                                        transition->SetTransitionType(Transition::TransitionType::high);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
                 else
                 {
-                    transition->SetTransitionType(Transition::TransitionType::low);
+                    transition->SetTransitionType(initialTransitionType);
                     return;
                 }
             }
@@ -137,7 +155,13 @@ void time_leak::NetAnalyzer::checkConditionallyLowStart(time_leak::Transition *t
         map<string, time_leak::Transition *> inputTransitions = inputPlace->second->GetInElements();
         for (auto inputTransition = inputTransitions.begin(); inputTransition != inputTransitions.end(); ++inputTransition)
         {
-            if (inputTransition->second->CheckIfLow() && inputPlace->second->GetHighOut() < 2 && !inputTransition->second->GetConditional())
+            if (transition->GetTransitionType() == Transition::TransitionType::high && (inputTransition->second->CheckIfLow() || inputTransition->second->GetTransitionType() == Transition::TransitionType::lowEnd) && !inputTransition->second->GetConditional())
+            {
+                transition->SetTransitionType(Transition::TransitionType::lowStart);
+                transition->SetConditional();
+                return;
+            }
+            else if (inputTransition->second->CheckIfLow() && inputPlace->second->GetHighOut() < 2 && !inputTransition->second->GetConditional())
             {
                 conditionally = true;
             } 
@@ -169,7 +193,6 @@ void time_leak::NetAnalyzer::checkConditionallyLowStart(time_leak::Transition *t
         if (!conditionally)
         {
             conditionallyLowStart = false;
-            break;
         }
     }
 
@@ -196,7 +219,7 @@ void time_leak::NetAnalyzer::checkConditionallyLowEnd(time_leak::Transition *tra
         map<string, Transition*> outputTransitions = outputPlace->second->GetOutElements();
         for (auto outputTransition = outputTransitions.begin(); outputTransition != outputTransitions.end(); ++outputTransition)
         {
-            if (outputTransition->second->CheckIfLow() || outputTransition->second->GetTransitionType() == Transition::TransitionType::lowStart)
+            if ((outputTransition->second->CheckIfLow() || outputTransition->second->GetTransitionType() == Transition::TransitionType::lowStart) && !outputTransition->second->GetConditional())
             {
                 conditionallyLowEnd = true;
                 break;

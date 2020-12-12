@@ -132,7 +132,7 @@ if (!res.result) console.log(res.issues)
 fs.writeFile('./output-run.json', JSON.stringify(firstNet), err => { })
 fs.writeFile('./output.json', JSON.stringify(JSON.stringify(firstNet)), err => { });
 //console.log(numberOfElements);
-console.log(JSON.stringify(firstNet), numberOfElements)
+console.log(numberOfElements)
 
 
 
