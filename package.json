@@ -9,7 +9,7 @@
     "dev": "set NODE_ENV=dev&&nodemon server.js",
     "copy-main": "docker cp <image-id>:/usr/src/app/main ./time-leak-detector",
     "up": "docker run -it app:latest",
-    "build": "docker build . -t app:latest",
+    "build-docker": "docker build . -t app:latest",
     "test": "mocha test.js"
   },
   "repository": {
