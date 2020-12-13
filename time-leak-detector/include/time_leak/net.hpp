@@ -20,13 +20,12 @@ namespace time_leak
             map<std::string, time_leak::Transition *> highTransitions;
 
         private:
-            const char* findStartPlace();
-            time_leak::Place * getPlace(const char* placeId);
-            time_leak::Transition * getTransition(const char* transitionId);
-            time_leak::Place * createPlace(const char* placeId);
-            time_leak::Transition * createTransition(const char* transitionId);
-            time_leak::Place * getPlaceById(const char* placeId);
-            time_leak::Transition * getTransitionById(const char* transitionId);
+            void populatePlaces();
+            void populateTransitions();
+            void createPlacesForwardLinks();
+            void createPlaceBackwardLink(string transitionId, Transition *transition);
+            void createTransitionsForwardLinks(map<string, Transition *> transitions);
+            void createTransitionBackwardLink(string transitionId, Place *place);
 
         public:
             Net(rapidjson::Document net);
