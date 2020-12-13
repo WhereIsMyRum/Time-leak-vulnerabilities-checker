@@ -6,168 +6,96 @@ time_leak::Net::Net(rapidjson::Document net)
 {
     this->net.CopyFrom(net, this->net.GetAllocator());
 
-    const char* startPlace = findStartPlace();
-    getPlace(startPlace);
+    populatePlaces();
+    populateTransitions();
+    createPlacesForwardLinks();
+    createTransitionsForwardLinks(lowTransitions);
+    createTransitionsForwardLinks(highTransitions);
 }
 
-const char* time_leak::Net::findStartPlace()
+void time_leak::Net::populatePlaces()
 {
     rapidjson::Value::ConstValueIterator iterator;
 
-    for (iterator = net["places"].Begin(); iterator != net["places"].End(); ++iterator)
+    for (iterator = net["places"].Begin(); iterator != net["places"].End(); ++ iterator)
     {
-        bool found = false;
-        rapidjson::Value::MemberIterator transition;
-
-        for (transition = net["flows"]["transitions"].MemberBegin(); transition != net["flows"]["transitions"].MemberEnd(); ++transition)
+        if (net["flows"]["places"].HasMember(iterator->GetString()))
         {
-            rapidjson::Value::ConstValueIterator place;
-            for (place = net["flows"]["transitions"][transition->name.GetString()].Begin(); place != net["flows"]["transitions"][transition->name.GetString()].End(); ++place)
-            {
-                if (place->GetString() == iterator->GetString())
-                {
-                    found = true;
-                    break;
-                }
-            }
+            places.insert(pair<string, time_leak::Place *>(iterator->GetString(), new time_leak::Place(iterator->GetString())));
         }
-
-        if (found == false)
+        else
         {
-            return iterator->GetString();
+            places.insert(pair<string, time_leak::Place *>("end", new time_leak::Place(iterator->GetString())));
+            places.at("end")->SetAnalyzed(true);
         }
     }
-    return "";
 }
 
-time_leak::Place *time_leak::Net::getPlace(const char* placeId)
+void time_leak::Net::populateTransitions()
 {
-    time_leak::Place *place;
-    try
-    {
-        place = getPlaceById(placeId);
-    }
-    catch (const char *e)
-    {
-        place = createPlace(placeId);
-    }
-
-    return place;
-}
-
-time_leak::Transition *time_leak::Net::getTransition(const char* transitionId)
-{
-    time_leak::Transition *transition;
-    try
-    {
-        transition = getTransitionById(transitionId);
-    }
-    catch (const char *e)
-    {
-        transition = createTransition(transitionId);
-    }
-
-    return transition;
-}
-
-time_leak::Place *time_leak::Net::createPlace(const char* placeId)
-{
-    time_leak::Place *place = new time_leak::Place(placeId);
-
-    rapidjson::Value::ConstValueIterator transition;
-
-    const rapidjson::Value &flowsPlaces = net["flows"]["places"];
-
-    if (flowsPlaces.HasMember(placeId))
-    {
-        for (transition = flowsPlaces[placeId].Begin(); transition != flowsPlaces[placeId].End(); ++transition)
-        {
-            time_leak::Transition *outputTransition = getTransition(transition->GetString());
-            place->AddOutElement(outputTransition);
-            outputTransition->AddInElement(place);
-        }
-        places.insert(pair<string, time_leak::Place *>(placeId, place));
-    }
-    else
-    {
-        places.insert(pair<string, time_leak::Place *>("end", place));
-    }
-
-    return place;
-}
-
-time_leak::Place *time_leak::Net::getPlaceById(const char* placeId)
-{
-    try
-    {
-        return places.at(placeId);
-    }
-    catch (const std::out_of_range e)
-    {
-        throw("Place not found");
-    }
-}
-
-time_leak::Transition *time_leak::Net::createTransition(const char* transitionId)
-{
-    time_leak::Transition *transition;
     rapidjson::Value::ConstValueIterator iterator;
-    bool high = false;
     for (iterator = net["transitions"]["high"].Begin(); iterator != net["transitions"]["high"].End(); ++iterator)
     {
-        if (strcmp(iterator->GetString(), transitionId) == 0)
-        {
-            high = true;
-        }
+        highTransitions.insert(pair<string, time_leak::Transition *>(iterator->GetString(), new time_leak::Transition(iterator->GetString())));
     }
 
-    if (high == true)
+    for (iterator = net["transitions"]["low"].Begin(); iterator != net["transitions"]["low"].End(); ++iterator)
     {
-        transition = new time_leak::Transition(transitionId);
-        highTransitions.insert(pair<std::string, time_leak::Transition *>(transitionId, transition));
+        lowTransitions.insert(pair<string, time_leak::Transition *>(iterator->GetString(), new time_leak::Transition(iterator->GetString(), false, Transition::TransitionType::low)));
     }
-    else
-    {
-        transition = new time_leak::Transition(transitionId, false, time_leak::Transition::TransitionType::low);
-        lowTransitions.insert(pair<std::string, time_leak::Transition *>(transitionId, transition));
-    }
-
-    rapidjson::Value::ConstValueIterator place;
-    for (place = net["flows"]["transitions"][transitionId].Begin(); place != net["flows"]["transitions"][transitionId].End(); ++place)
-    {
-        time_leak::Place *outputPlace;
-        if (net["flows"]["places"].HasMember(place->GetString()))
-        {
-            outputPlace = getPlace(place->GetString());
-        } else 
-        {
-            const char* id = "end";
-            outputPlace = getPlace(id);
-        }
-        transition->AddOutElement(outputPlace);
-        outputPlace->AddInElement(transition);
-    }
-
-    return transition;
 }
 
-time_leak::Transition *time_leak::Net::getTransitionById(const char* transitionId)
+void time_leak::Net::createPlacesForwardLinks()
 {
-    try
+    map<string, time_leak::Place *>::iterator iterator;
+    for (iterator = places.begin(); iterator != places.end(); ++iterator)
     {
-        return lowTransitions.at(transitionId);
+        const char *placeKey;
+        placeKey = iterator->second->GetId().c_str();
+        if (net["flows"]["places"].HasMember(placeKey))
+        {
+            for (rapidjson::SizeType i = 0; i < net["flows"]["places"][placeKey].Size(); ++i)
+            {
+                string transitionId = net["flows"]["places"][placeKey][i].GetString();
+                if (lowTransitions.find(transitionId) != lowTransitions.end())
+                    iterator->second->AddOutElement(lowTransitions.at(transitionId));
+                else
+                    iterator->second->AddOutElement(highTransitions.at(transitionId));
+
+                createTransitionBackwardLink(transitionId, iterator->second);
+            }
+        }
     }
-    catch (const out_of_range e)
+}
+
+void time_leak::Net::createPlaceBackwardLink(string transitionId, time_leak::Transition *transition)
+{
+    places.at(transitionId)->AddInElement(transition);
+}
+
+void time_leak::Net::createTransitionsForwardLinks(map<string, time_leak::Transition *> transitions)
+{
+    map<string, time_leak::Transition *>::iterator iterator;
+    for (iterator = transitions.begin(); iterator != transitions.end(); ++iterator)
     {
-        try
+        const char *transitionKey = iterator->second->GetId().c_str();
+        for (rapidjson::SizeType i = 0; i < net["flows"]["transitions"][transitionKey].Size(); ++i)
         {
-            return highTransitions.at(transitionId);
-        }
-        catch (const out_of_range e2)
-        {
-            throw("Transition not found");
+            string placeId = net["flows"]["transitions"][transitionKey][i].GetString();
+            placeId = places.find(placeId) == places.end() ? "end" : placeId;
+            iterator->second->AddOutElement(places.at(placeId));
+
+            createPlaceBackwardLink(placeId, iterator->second);
         }
     }
+}
+
+void time_leak::Net::createTransitionBackwardLink(string transitionId, time_leak::Place *place)
+{
+    if (lowTransitions.find(transitionId) != lowTransitions.end())
+        lowTransitions.at(transitionId)->AddInElement(place);
+    else
+        highTransitions.at(transitionId)->AddInElement(place);
 }
 
 void time_leak::Net::PrintNet()
@@ -178,17 +106,17 @@ void time_leak::Net::PrintNet()
     places.at("end")->Print();
 }
 
-map<std::string, time_leak::Place *> &time_leak::Net::GetPlaces()
+map<std::string, time_leak::Place *>& time_leak::Net::GetPlaces()
 {
     return this->places;
 }
 
-map<std::string, time_leak::Transition *> &time_leak::Net::GetLowTransitions()
+map<std::string, time_leak::Transition *>& time_leak::Net::GetLowTransitions()
 {
     return this->lowTransitions;
 }
 
-map<std::string, time_leak::Transition *> &time_leak::Net::GetHighTransitions()
+map<std::string, time_leak::Transition *>& time_leak::Net::GetHighTransitions()
 {
     return this->highTransitions;
 }
