@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import random
 from shutil import copyfile
 
+maxNoOfElements = 10000
+
 ROOT = './netPiecesPrunable/'
 outputFile = 'output.json'
 
@@ -70,7 +72,10 @@ def plotResults(results, maxNoOfElements):
     plt.xlabel('Number of Elements')
     plt.ylabel('time [ms]')
 
+    print(creationDuration)
     print(noPruningNoConditional)
+    print(pruningNoConditional)
+    print(noPruningConditional)
 
     plt.scatter(noPruningNoConditional[0], noPruningNoConditional[1], c='b', label='Without pruning',  s=1)
     plt.plot(line, nPnC(line), '-b', label="Without pruning")
@@ -92,8 +97,6 @@ def plotResults(results, maxNoOfElements):
     plt.show()
 
 def main():
-    maxNoOfElements = 100
-
     results = runBenchmark(maxNoOfElements)
     plotResults(results, maxNoOfElements)
 

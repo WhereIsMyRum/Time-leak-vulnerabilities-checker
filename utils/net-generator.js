@@ -5,8 +5,7 @@ let currentMaxPlace = 2
 let currentMaxHigh = 0
 let currentMaxLow = 1
 
-function generateNet(net = { "places": ["p1", "p2"], "transitions": { "high": [], "low": ["L1"] }, "flows": { "places": { "p1": ["L1"] }, "transitions": { "L1": ["p2"] } } }, recursionDepth = 0, distribution = [10, 10, 40, 20, 20], previous = {type: 1}) {
-    switch (getType(distribution)) {
+function generateNet(net = { "places": ["p1", "p2"], "transitions": { "high": [], "low": ["L1"] }, "flows": { "places": { "p1": ["L1"] }, "transitions": { "L1": ["p2"] } } }, recursionDepth = 0, distribution = [5, 20, 25, 25, 25], previous = {type: 1}) {    switch (getType(distribution)) {
         case 1:
             returnNet = getBaseLow(net);
             break;
@@ -88,7 +87,7 @@ function getBaseLow(net) {
 }
 
 function getSequentialComposition(net, recursionDepth, distribution) {
-    if (recursionDepth > 10) {
+    if (recursionDepth > 6) {
         distribution = [50, 50, 0, 0, 0];
     }
     let netOutput = generateNet(net, recursionDepth, distribution, {type: 3});
@@ -99,7 +98,7 @@ function getSequentialComposition(net, recursionDepth, distribution) {
 
 
 function getBranchingComposition(baseNet, recursionDepth, distribution, previous) {
-    if (recursionDepth > 2) {
+    if (recursionDepth > 6) {
         distribution = [50, 50, 0, 0, 0]
     }
 
@@ -188,7 +187,7 @@ function getPlacesWithNoOutput(net) {
 }
 
 function getParallelComposition(baseNet, recursionDepth, distribution, previous) {
-    if (recursionDepth > 2) {
+    if (recursionDepth > 6) {
         distribution = [50, 50, 0, 0, 0]
     }
 
