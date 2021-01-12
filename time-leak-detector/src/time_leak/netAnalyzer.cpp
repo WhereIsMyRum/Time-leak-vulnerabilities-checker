@@ -70,6 +70,7 @@ void time_leak::NetAnalyzer::checkForSpecialCases(map<string, time_leak::Transit
         this->checkIntervalOnlyCase(iterator->second);
         if (runConditional)
             this->checkConditionalCase(iterator->second);
+            this->checkIntervalOnlyCase(iterator->second);
     }
 
 }
@@ -109,6 +110,9 @@ void time_leak::NetAnalyzer::checkIntervalOnlyCase(time_leak::Transition *transi
                                     if (!it4->second->CheckIfLow())
                                     {
                                         transition->SetTransitionType(Transition::TransitionType::high);
+                                        if (transition->GetConditional()) {
+                                            transition->SetConditional(false);
+                                        }
                                     }
                                 }
                             }

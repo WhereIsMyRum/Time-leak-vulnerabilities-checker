@@ -19,9 +19,9 @@ void time_leak::Transition::SetTransitionType(time_leak::Transition::TransitionT
     this->transitionType = t;
 }
 
-void time_leak::Transition::SetConditional()
+void time_leak::Transition::SetConditional(bool value)
 {
-    this->conditional = true;
+    this->conditional = value;
 }
 
 bool time_leak::Transition::GetConditional()
