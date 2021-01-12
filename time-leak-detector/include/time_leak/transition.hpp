@@ -38,7 +38,7 @@ namespace time_leak
         bool Analyze();
         std::string GetTransitionTypeString();
         void SetTransitionType(TransitionType t);
-        void SetConditional();
+        void SetConditional(bool value  = true);
         bool GetConditional();
 
     };
