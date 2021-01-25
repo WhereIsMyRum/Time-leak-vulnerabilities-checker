@@ -8,7 +8,7 @@
 <h3 class="how">How</h3>
 <p class="how"></p>
 <h3 class="usage">How to use</h3>
-  <p class="usage"></h3>
+  <p class="usage"></p>
 <ul class="technologies">
   <li class="technologies">C++</li>
   <li class="technologies">Node.js</li>
@@ -19,5 +19,5 @@
 </ul>
 <hr>
 <small class="created">Created: January 2021</small>
-</body>
+  </body>
 </html>
