@@ -1,6 +1,6 @@
 <html>
 <body>
-<h1 class="title">Time Leak Vulnerabilities checker</h1>
+<h1 class="title">Time Leak Vulnerabilities Checker</h1>
 <h3 class="why">Why</h3>
   <p class="why"></p>
 <h3 class="what">What</h3>
