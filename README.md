@@ -10,12 +10,12 @@
 <h3 class="usage">How to use</h3>
   <p class="usage"></p>
 <ul class="technologies">
-  <li class="technologies">C++</li>
-  <li class="technologies">Node.js</li>
-  <li class="technologies">Express.js</li>
-  <li class="technologies">RapidJSON</li>
-  <li class="technologies">Algorithms</li>
-  <li class="technologies">Heroku</li>
+  <li class="technologies" hover="C++">C++</li>
+  <li class="technologies" hover="Node.js">Node.js</li>
+  <li class="technologies" hover="Express.js">Express.js</li>
+  <li class="technologies" hover="RapidJSON">RapidJSON</li>
+  <li class="technologies" hover="Alogirytmy">Algorithms</li>
+  <li class="technologies" hover="Heroku">Heroku</li> 
 </ul>
 <hr>
 <small class="created">Created: January 2021</small>
