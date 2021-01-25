@@ -11,6 +11,7 @@
 <ul class="technologies">
   <li class="technologies" hover="C++">C++</li>
   <li class="technologies" hover="Node.js">Node.js</li>
+  <li class="technologies" hover="Express.js">Express.js</li>
   <li class="technologies" hover="RapidJSON">RapidJSON</li>
   <li class="technologies" hover="Alogirytmy">Algorytmy</li>
   <li class="technologies" hover="Heroku">Heroku</li> 
